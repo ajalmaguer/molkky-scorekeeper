@@ -1,4 +1,4 @@
-import { Game, Team } from './game';
+import { Game, Player, Team } from './game';
 
 describe('Teams', () => {
   it('can create team', () => {
@@ -49,7 +49,33 @@ describe('adding players to teams', () => {
   });
 });
 
-describe('example game with two teams, each team with two people', () => {
+describe('turns', () => {
+  let game: Game;
+  beforeEach(() => {
+    game = new Game();
+    game.addTeam('Team 1');
+    game.teams[0].addPlayer('player a');
+    game.teams[0].addPlayer('player b');
+    game.addTeam('Team 2');
+    game.teams[1].addPlayer('player x');
+    game.teams[1].addPlayer('player y');
+  });
+
+  it('whosNext returns a player', () => {
+    expect(game.whosNext.name).toEqual('player a');
+  });
+
+  it('nextPlayer goes to next player', () => {
+    expect(game.whosNext.name).toEqual('player a');
+    game.nextPlayer();
+    expect(game.whosNext.name).toEqual('player x');
+    game.nextPlayer();
+    expect(game.whosNext.name).toEqual('player b');
+    game.nextPlayer();
+    expect(game.whosNext.name).toEqual('player y');
+    game.nextPlayer();
+    expect(game.whosNext.name).toEqual('player a');
+  });
   // it.todo('team 1 scores 5', () => {
   //   // then its team 2 turn
   // });
