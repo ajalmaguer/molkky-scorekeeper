@@ -65,7 +65,7 @@ describe('turns', () => {
     expect(game.whosNext.name).toEqual('player a');
   });
 
-  it('nextPlayer goes to next player', () => {
+  it('nextPlayer iterates through each player in each team', () => {
     expect(game.whosNext.name).toEqual('player a');
     game.nextPlayer();
     expect(game.whosNext.name).toEqual('player x');
