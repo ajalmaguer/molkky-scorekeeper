@@ -1,17 +1,48 @@
+import { v4 as uuid } from 'uuid';
+
 export class Game {
   teams: Team[] = [];
 
   addTeam(name: string) {
-    this.teams.push(new Team(name));
+    const newTeam = new Team(name);
+    this.teams.push(newTeam);
+    return newTeam.id;
   }
 
-  delete(name: string) {
-    this.teams = this.teams.filter((team) => team.name !== name);
+  removeTeam(index: number) {
+    this.teams.splice(index, 1);
   }
-
-  blah() {}
 }
 
 export class Team {
-  constructor(public name: string) {}
+  id: string;
+  players: Player[] = [];
+
+  constructor(public name: string) {
+    this.id = uuid();
+  }
+
+  updateName(newName: string) {
+    this.name = newName;
+  }
+
+  addPlayer(playerName: string) {
+    this.players.push(new Player(playerName));
+  }
+
+  removePlayer(index: number) {
+    this.players.splice(index, 1);
+  }
+}
+
+export class Player {
+  id: string;
+
+  constructor(public name: string) {
+    this.id = uuid();
+  }
+
+  updateName(newName: string) {
+    this.name = newName;
+  }
 }
