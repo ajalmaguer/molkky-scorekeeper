@@ -116,4 +116,16 @@ describe('scoring', () => {
       { score: 7, runningTotal: 12 },
     ]);
   });
+
+  test('scoring resets if you go over 50', () => {
+    const team = new Team('team 1');
+    team.addScore(49);
+    team.addScore(2);
+    team.addScore(2);
+    expect(team.scoresForDisplay).toEqual([
+      { score: 49, runningTotal: 49 },
+      { score: 2, runningTotal: 25 },
+      { score: 2, runningTotal: 27 },
+    ]);
+  });
 });

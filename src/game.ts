@@ -75,6 +75,9 @@ export class Team {
     let runningTotal = 0;
     return this.scores.map((score) => {
       runningTotal += score;
+      if (runningTotal > 50) {
+        runningTotal = 25;
+      }
       return {
         score,
         runningTotal: runningTotal,
