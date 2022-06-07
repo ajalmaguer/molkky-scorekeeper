@@ -20,11 +20,7 @@ export class Game {
 
   nextPlayer() {
     this.teams[this.currentTeamIndex].nextPlayer();
-    if (this.currentTeamIndex >= this.teams.length - 1) {
-      this.currentTeamIndex = 0;
-    } else {
-      this.currentTeamIndex++;
-    }
+    this.currentTeamIndex = (this.currentTeamIndex + 1) % this.teams.length;
   }
 }
 
@@ -32,6 +28,7 @@ export class Team {
   id: string;
   players: Player[] = [];
   currentPlayerIndex = 0;
+  scores: number[] = [];
 
   constructor(public name: string) {
     this.id = uuid();
@@ -54,11 +51,35 @@ export class Team {
   }
 
   nextPlayer() {
-    if (this.currentPlayerIndex >= this.players.length - 1) {
-      this.currentPlayerIndex = 0;
-    } else {
-      this.currentPlayerIndex++;
-    }
+    this.currentPlayerIndex =
+      (this.currentPlayerIndex + 1) % this.players.length;
+  }
+
+  addScore(score: number) {
+    this.scores.push(score);
+  }
+
+  editScore(scoreIndex: number, newScore: number) {
+    this.scores[scoreIndex] = newScore;
+  }
+
+  removeScore(scoreIndex: number) {
+    this.scores.splice(scoreIndex, 1);
+  }
+
+  get totalScore(): number {
+    return this.scores.reduce((prev, curr) => prev + curr, 0);
+  }
+
+  get scoresForDisplay(): ScoreForDisplay[] {
+    let runningTotal = 0;
+    return this.scores.map((score) => {
+      runningTotal += score;
+      return {
+        score,
+        runningTotal: runningTotal,
+      };
+    });
   }
 }
 
@@ -72,4 +93,9 @@ export class Player {
   updateName(newName: string) {
     this.name = newName;
   }
+}
+
+export class ScoreForDisplay {
+  score = 0;
+  runningTotal = 0;
 }

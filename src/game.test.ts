@@ -76,10 +76,44 @@ describe('turns', () => {
     game.nextPlayer();
     expect(game.whosNext.name).toEqual('player a');
   });
-  // it.todo('team 1 scores 5', () => {
-  //   // then its team 2 turn
-  // });
-  // it.todo('team 2 scores 11', () => {
-  //   // then its team 1 turn again but new person's turn
-  // });
+});
+
+describe('scoring', () => {
+  it('keeps track of scores', () => {
+    const game = new Game();
+    game.addTeam('Team 1');
+    game.teams[0].addScore(5);
+    expect(game.teams[0].totalScore).toEqual(5);
+    game.teams[0].addScore(7);
+    expect(game.teams[0].totalScore).toEqual(12);
+  });
+
+  it('you can edit scores', () => {
+    const game = new Game();
+    game.addTeam('Team 1');
+    game.teams[0].addScore(5);
+    expect(game.teams[0].totalScore).toEqual(5);
+    game.teams[0].editScore(0, 7);
+    expect(game.teams[0].totalScore).toEqual(7);
+  });
+
+  it('you can remove score', () => {
+    const game = new Game();
+    game.addTeam('Team 1');
+    game.teams[0].addScore(5);
+    game.teams[0].addScore(7);
+    expect(game.teams[0].scores).toEqual([5, 7]);
+    game.teams[0].removeScore(1);
+    expect(game.teams[0].scores).toEqual([5]);
+  });
+
+  it('you can display running totals', () => {
+    const team = new Team('team 1');
+    team.addScore(5);
+    team.addScore(7);
+    expect(team.scoresForDisplay).toEqual([
+      { score: 5, runningTotal: 5 },
+      { score: 7, runningTotal: 12 },
+    ]);
+  });
 });
