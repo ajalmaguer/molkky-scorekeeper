@@ -14,13 +14,18 @@ export class Game {
     this.teams.splice(index, 1);
   }
 
-  get whosNext(): Player {
-    return this.teams[this.currentTeamIndex].whosNext;
+  get whosNext(): Player | null {
+    return this.teams[this.currentTeamIndex]?.whosNext ?? null;
   }
 
   nextPlayer() {
     this.teams[this.currentTeamIndex].nextPlayer();
     this.currentTeamIndex = (this.currentTeamIndex + 1) % this.teams.length;
+  }
+
+  submitScoreForCurrentTeam(score: number) {
+    this.teams[this.currentTeamIndex].addScore(score);
+    this.nextPlayer();
   }
 }
 

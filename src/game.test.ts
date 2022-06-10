@@ -49,6 +49,13 @@ describe('adding players to teams', () => {
   });
 });
 
+describe('whosNext', () => {
+  it('returns null if no players', () => {
+    const game = new Game();
+    expect(game.whosNext).toBeNull();
+  });
+});
+
 describe('turns', () => {
   let game: Game;
   beforeEach(() => {
@@ -62,19 +69,19 @@ describe('turns', () => {
   });
 
   it('whosNext returns a player', () => {
-    expect(game.whosNext.name).toEqual('player a');
+    expect(game.whosNext?.name).toEqual('player a');
   });
 
   it('nextPlayer iterates through each player in each team', () => {
-    expect(game.whosNext.name).toEqual('player a');
+    expect(game.whosNext?.name).toEqual('player a');
     game.nextPlayer();
-    expect(game.whosNext.name).toEqual('player x');
+    expect(game.whosNext?.name).toEqual('player x');
     game.nextPlayer();
-    expect(game.whosNext.name).toEqual('player b');
+    expect(game.whosNext?.name).toEqual('player b');
     game.nextPlayer();
-    expect(game.whosNext.name).toEqual('player y');
+    expect(game.whosNext?.name).toEqual('player y');
     game.nextPlayer();
-    expect(game.whosNext.name).toEqual('player a');
+    expect(game.whosNext?.name).toEqual('player a');
   });
 });
 
@@ -127,5 +134,19 @@ describe('scoring', () => {
       { score: 2, runningTotal: 25 },
       { score: 2, runningTotal: 27 },
     ]);
+  });
+});
+
+describe('Game > submitScoreForCurrentTeam', () => {
+  it('submits score for team and goes to next team', () => {
+    const game = new Game();
+    game.addTeam('team 1');
+    game.teams[0].addPlayer('player a');
+    game.addTeam('team 2');
+    game.teams[1].addPlayer('player x');
+
+    game.submitScoreForCurrentTeam(5);
+    expect(game.teams[0].scores).toEqual([5]);
+    expect(game.whosNext?.name).toEqual('player x');
   });
 });
