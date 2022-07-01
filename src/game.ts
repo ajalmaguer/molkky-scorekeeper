@@ -4,8 +4,18 @@ export class Game {
   teams: Team[] = [];
   currentTeamIndex = 0;
 
+  constructor(initialGame: Partial<Game>) {
+    console.log({ initialGame });
+    if (initialGame.teams) {
+      this.teams = initialGame.teams.map((team) => new Team(team));
+    }
+    if (initialGame.currentTeamIndex) {
+      this.currentTeamIndex = initialGame.currentTeamIndex;
+    }
+  }
+
   addTeam(name: string) {
-    const newTeam = new Team(name);
+    const newTeam = new Team({ name });
     this.teams.push(newTeam);
     return newTeam.id;
   }
@@ -34,17 +44,24 @@ export class Team {
   players: Player[] = [];
   currentPlayerIndex = 0;
   scores: number[] = [];
+  name: string = '';
 
-  constructor(public name: string) {
+  constructor(initialTeam: Partial<Team>) {
     this.id = uuid();
+    if (initialTeam.name) {
+      this.name = initialTeam.name;
+    }
+    if (initialTeam.players) {
+      this.players = initialTeam.players.map((player) => new Player(player));
+    }
   }
 
   updateName(newName: string) {
     this.name = newName;
   }
 
-  addPlayer(playerName: string) {
-    this.players.push(new Player(playerName));
+  addPlayer(name: string) {
+    this.players.push(new Player({ name }));
   }
 
   removePlayer(index: number) {
@@ -93,9 +110,16 @@ export class Team {
 
 export class Player {
   id: string;
+  name = '';
 
-  constructor(public name: string) {
+  constructor(initialPlayer: Partial<Player>) {
     this.id = uuid();
+    if (initialPlayer.name) {
+      this.name = initialPlayer.name;
+    }
+    if (initialPlayer.id) {
+      this.id = initialPlayer.id;
+    }
   }
 
   updateName(newName: string) {

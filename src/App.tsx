@@ -1,9 +1,9 @@
-import { FormEvent, FormEventHandler, useRef, useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import './App.css';
 import { Column, DataTable } from './data_table';
-import { Game, Player, ScoreForDisplay, Team } from './game';
+import { Game } from './game';
 
-const seedGame = new Game();
+const seedGame = new Game({});
 seedGame.addTeam('team 1');
 seedGame.teams[0].addPlayer('player a');
 seedGame.teams[0].addPlayer('player b');
@@ -94,7 +94,6 @@ function App() {
   function submitCurrentTeamScore(e: FormEvent) {
     e.preventDefault();
     const formData = new FormData(e.target! as HTMLFormElement);
-
     const score = Number(formData.get('score'));
     if (typeof score !== 'number') {
       console.log('score is not a number');

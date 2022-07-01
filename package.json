@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "jest"
+    "test": "jest --watchAll",
+    "test-once": "jest"
   },
   "dependencies": {
     "@types/uuid": "^8.3.4",
