@@ -1,4 +1,4 @@
-import { FormEvent, useRef, useState } from 'react';
+import { FormEvent, Fragment, useRef, useState } from 'react';
 import './App.css';
 import { Column, DataTable } from './data_table';
 import { Game } from './game';
@@ -43,8 +43,6 @@ function mapGame(game: Game): GameDataRow[] {
 function App() {
   const { current: game } = useRef(LocalStorageService.getGame());
   const [mappedGame, setMappedGame] = useState(mapGame(game));
-  const [whosNext, setWhosNext] = useState(game.whosNext);
-  const formRef = useRef<HTMLFormElement>(null);
 
   const columns: Column<GameDataRow>[] = [
     {
@@ -54,12 +52,43 @@ function App() {
       },
     },
   ];
-  game.teams.forEach((team) => {
+  game.teams.forEach((team, teamIndex) => {
     columns.push({
       header: (
         <>
-          <div>{team.name}</div>
-          <div>{team.players.map((player) => player.name).join(' / ')}</div>
+          <div>
+            {team.name}{' '}
+            <button
+              onClick={() =>
+                removeTeam({
+                  teamIndex,
+                  teamName: team.name,
+                })
+              }
+            >
+              🗑
+            </button>
+          </div>
+          <div>
+            {team.players.map((player, playerIndex) => (
+              <Fragment key={playerIndex}>
+                <span>{player.name}</span>
+                <button
+                  onClick={() =>
+                    removePlayer({
+                      teamIndex,
+                      playerIndex,
+                      teamName: team.name,
+                      playerName: player.name,
+                    })
+                  }
+                >
+                  🗑
+                </button>
+                {playerIndex !== team.players.length - 1 && <span>/</span>}
+              </Fragment>
+            ))}
+          </div>
         </>
       ),
       content: (rowData) => (
@@ -73,14 +102,83 @@ function App() {
   function updateGame(cb: () => void) {
     cb();
     setMappedGame(mapGame(game));
-    setWhosNext(game.whosNext);
     LocalStorageService.backupGame(game);
+  }
+
+  function removeTeam({
+    teamIndex,
+    teamName,
+  }: {
+    teamIndex: number;
+    teamName: string;
+  }) {
+    if (confirm(`Remove team ${teamName}?`)) {
+      updateGame(() => game.removeTeam(teamIndex));
+    }
+  }
+
+  function removePlayer({
+    teamIndex,
+    playerIndex,
+    teamName,
+    playerName,
+  }: {
+    teamIndex: number;
+    playerIndex: number;
+    teamName: string;
+    playerName: string;
+  }) {
+    if (confirm(`Remove ${playerName} from ${teamName}?`)) {
+      updateGame(() => {
+        game.teams[teamIndex].removePlayer(playerIndex);
+      });
+    }
   }
 
   function skipPlayer() {
     updateGame(() => game.nextPlayer());
   }
 
+  // ----------------------------------------
+  // new team
+  // ----------------------------------------
+  const newTeamForm = useRef<HTMLFormElement>(null);
+  function submitNewTeam(e: FormEvent) {
+    e.preventDefault();
+    const formData = new FormData(e.target! as HTMLFormElement);
+    const name = formData.get('name');
+    if (!name) {
+      return;
+    }
+
+    updateGame(() => game.addTeam(name as string));
+    newTeamForm.current?.reset();
+  }
+
+  // ----------------------------------------
+  // new player
+  // ----------------------------------------
+  const newPlayerForm = useRef<HTMLFormElement>(null);
+  function submitNewPlayer(e: FormEvent) {
+    e.preventDefault();
+    const formData = new FormData(e.target! as HTMLFormElement);
+    const name = formData.get('name');
+    const team = formData.get('team');
+    if (!name || !team) {
+      return;
+    }
+    console.log({ name, team });
+
+    updateGame(() =>
+      game.teams[parseInt(team as string)].addPlayer(name as string)
+    );
+    newPlayerForm.current?.reset();
+  }
+
+  // ----------------------------------------
+  // currentScoreForm
+  // ----------------------------------------
+  const currentScoreForm = useRef<HTMLFormElement>(null);
   function submitCurrentTeamScore(e: FormEvent) {
     e.preventDefault();
     const formData = new FormData(e.target! as HTMLFormElement);
@@ -90,7 +188,7 @@ function App() {
       return;
     }
     updateGame(() => game.submitScoreForCurrentTeam(score));
-    formRef.current?.reset();
+    currentScoreForm.current?.reset();
   }
 
   return (
@@ -99,15 +197,36 @@ function App() {
 
       <DataTable columns={columns} data={mappedGame} className="table" />
 
-      {whosNext && <div>Next Player: {whosNext.name}</div>}
+      {game.whosNext && <div>Next Player 2: {game.whosNext?.name}</div>}
+
       <div>
-        <form onSubmit={submitCurrentTeamScore} ref={formRef}>
+        <form onSubmit={submitCurrentTeamScore} ref={currentScoreForm}>
           <input type="number" name="score" min={0} max={12} />
           <button type="submit">Submit</button>
         </form>
       </div>
       <div>
         <button onClick={skipPlayer}>Skip Player</button>
+      </div>
+
+      <div>
+        <form onSubmit={submitNewTeam} ref={newTeamForm}>
+          <input type="text" name="name" placeholder="New Team Name" />
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+      <div>
+        <form onSubmit={submitNewPlayer} ref={newPlayerForm}>
+          <input type="text" name="name" placeholder="New Player Name" />
+          <select name="team">
+            {game.teams.map((team, index) => (
+              <option value={index} key={index}>
+                {team.name}
+              </option>
+            ))}
+          </select>
+          <button type="submit">Submit</button>
+        </form>
       </div>
     </div>
   );
