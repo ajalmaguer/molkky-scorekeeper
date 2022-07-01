@@ -1,49 +1,25 @@
 import { FormEvent, Fragment, useRef, useState } from 'react';
 import './App.css';
 import { Column, DataTable } from './data_table';
-import { Game } from './game';
 import { LocalStorageService } from './localStorageService';
-
-interface GameDataRow {
-  roundIndex: number;
-  [teamName: string]: any;
-}
-
-function runningTotalKey(teamName: string): string {
-  return teamName + 'runningTotal';
-}
-
-function mapGame(game: Game): GameDataRow[] {
-  const output: GameDataRow[] = [];
-
-  game.teams.forEach((team) => {
-    team.scoresForDisplay.forEach((score, scoreIndex) => {
-      const newData = {
-        [team.name]: score.score,
-        [runningTotalKey(team.name)]: score.runningTotal,
-      };
-
-      if (!output[scoreIndex]) {
-        output.push({
-          roundIndex: scoreIndex,
-          ...newData,
-        });
-      } else {
-        output[scoreIndex] = {
-          ...output[scoreIndex],
-          ...newData,
-        };
-      }
-    });
-  });
-
-  return output;
-}
+import { GameDataRow, mapGame, runningTotalKey } from './mapGame';
 
 function App() {
   const { current: game } = useRef(LocalStorageService.getGame());
   const [mappedGame, setMappedGame] = useState(mapGame(game));
 
+  // ----------------------------------------
+  // helper functions
+  // ----------------------------------------
+  function updateGame(cb: () => void) {
+    cb();
+    setMappedGame(mapGame(game));
+    LocalStorageService.backupGame(game);
+  }
+
+  // ----------------------------------------
+  // generate columns
+  // ----------------------------------------
   const columns: Column<GameDataRow>[] = [
     {
       header: '',
@@ -99,10 +75,20 @@ function App() {
     });
   });
 
-  function updateGame(cb: () => void) {
-    cb();
-    setMappedGame(mapGame(game));
-    LocalStorageService.backupGame(game);
+  // ----------------------------------------
+  // add/remove teams
+  // ----------------------------------------
+  const newTeamForm = useRef<HTMLFormElement>(null);
+  function submitNewTeam(e: FormEvent) {
+    e.preventDefault();
+    const formData = new FormData(e.target! as HTMLFormElement);
+    const name = formData.get('name');
+    if (!name) {
+      return;
+    }
+
+    updateGame(() => game.addTeam(name as string));
+    newTeamForm.current?.reset();
   }
 
   function removeTeam({
@@ -115,6 +101,26 @@ function App() {
     if (confirm(`Remove team ${teamName}?`)) {
       updateGame(() => game.removeTeam(teamIndex));
     }
+  }
+
+  // ----------------------------------------
+  // add/remove players
+  // ----------------------------------------
+  const newPlayerForm = useRef<HTMLFormElement>(null);
+  function submitNewPlayer(e: FormEvent) {
+    e.preventDefault();
+    const formData = new FormData(e.target! as HTMLFormElement);
+    const name = formData.get('name');
+    const team = formData.get('team');
+    if (!name || !team) {
+      return;
+    }
+    console.log({ name, team });
+
+    updateGame(() =>
+      game.teams[parseInt(team as string)].addPlayer(name as string)
+    );
+    newPlayerForm.current?.reset();
   }
 
   function removePlayer({
@@ -135,48 +141,8 @@ function App() {
     }
   }
 
-  function skipPlayer() {
-    updateGame(() => game.nextPlayer());
-  }
-
   // ----------------------------------------
-  // new team
-  // ----------------------------------------
-  const newTeamForm = useRef<HTMLFormElement>(null);
-  function submitNewTeam(e: FormEvent) {
-    e.preventDefault();
-    const formData = new FormData(e.target! as HTMLFormElement);
-    const name = formData.get('name');
-    if (!name) {
-      return;
-    }
-
-    updateGame(() => game.addTeam(name as string));
-    newTeamForm.current?.reset();
-  }
-
-  // ----------------------------------------
-  // new player
-  // ----------------------------------------
-  const newPlayerForm = useRef<HTMLFormElement>(null);
-  function submitNewPlayer(e: FormEvent) {
-    e.preventDefault();
-    const formData = new FormData(e.target! as HTMLFormElement);
-    const name = formData.get('name');
-    const team = formData.get('team');
-    if (!name || !team) {
-      return;
-    }
-    console.log({ name, team });
-
-    updateGame(() =>
-      game.teams[parseInt(team as string)].addPlayer(name as string)
-    );
-    newPlayerForm.current?.reset();
-  }
-
-  // ----------------------------------------
-  // currentScoreForm
+  // submit score/ skip players
   // ----------------------------------------
   const currentScoreForm = useRef<HTMLFormElement>(null);
   function submitCurrentTeamScore(e: FormEvent) {
@@ -191,6 +157,13 @@ function App() {
     currentScoreForm.current?.reset();
   }
 
+  function skipPlayer() {
+    updateGame(() => game.nextPlayer());
+  }
+
+  // ----------------------------------------
+  // render
+  // ----------------------------------------
   return (
     <div className="App">
       <header className=""></header>
