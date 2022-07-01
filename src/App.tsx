@@ -2,22 +2,7 @@ import { FormEvent, useRef, useState } from 'react';
 import './App.css';
 import { Column, DataTable } from './data_table';
 import { Game } from './game';
-
-const seedGame = new Game({});
-seedGame.addTeam('team 1');
-seedGame.teams[0].addPlayer('player a');
-seedGame.teams[0].addPlayer('player b');
-seedGame.addTeam('team 2');
-seedGame.teams[1].addPlayer('player x');
-seedGame.teams[1].addPlayer('player y');
-
-seedGame.teams[0].addScore(5);
-seedGame.teams[0].addScore(5);
-seedGame.teams[0].addScore(4);
-
-seedGame.teams[1].addScore(2);
-seedGame.teams[1].addScore(2);
-seedGame.teams[1].addScore(5);
+import { LocalStorageService } from './localStorageService';
 
 interface GameDataRow {
   roundIndex: number;
@@ -56,9 +41,9 @@ function mapGame(game: Game): GameDataRow[] {
 }
 
 function App() {
-  const { current: game } = useRef(seedGame);
-  const [mappedGame, setMappedGame] = useState(mapGame(seedGame));
-  const [whosNext, setWhosNext] = useState(seedGame.whosNext);
+  const { current: game } = useRef(LocalStorageService.getGame());
+  const [mappedGame, setMappedGame] = useState(mapGame(game));
+  const [whosNext, setWhosNext] = useState(game.whosNext);
   const formRef = useRef<HTMLFormElement>(null);
 
   const columns: Column<GameDataRow>[] = [
@@ -85,10 +70,15 @@ function App() {
     });
   });
 
-  function skipPlayer() {
-    game.nextPlayer();
+  function updateGame(cb: () => void) {
+    cb();
     setMappedGame(mapGame(game));
     setWhosNext(game.whosNext);
+    LocalStorageService.backupGame(game);
+  }
+
+  function skipPlayer() {
+    updateGame(() => game.nextPlayer());
   }
 
   function submitCurrentTeamScore(e: FormEvent) {
@@ -99,9 +89,7 @@ function App() {
       console.log('score is not a number');
       return;
     }
-    game.submitScoreForCurrentTeam(score);
-    setMappedGame(mapGame(game));
-    setWhosNext(game.whosNext);
+    updateGame(() => game.submitScoreForCurrentTeam(score));
     formRef.current?.reset();
   }
 
