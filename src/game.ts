@@ -5,7 +5,6 @@ export class Game {
   currentTeamIndex = 0;
 
   constructor(initialGame: Partial<Game>) {
-    console.log({ initialGame });
     if (initialGame.teams) {
       this.teams = initialGame.teams.map((team) => new Team(team));
     }
@@ -47,12 +46,22 @@ export class Team {
   name: string = '';
 
   constructor(initialTeam: Partial<Team>) {
-    this.id = uuid();
+    if (initialTeam.id) {
+      this.id = initialTeam.id;
+    } else {
+      this.id = uuid();
+    }
     if (initialTeam.name) {
       this.name = initialTeam.name;
     }
+    if (initialTeam.currentPlayerIndex) {
+      this.currentPlayerIndex = initialTeam.currentPlayerIndex;
+    }
     if (initialTeam.players) {
       this.players = initialTeam.players.map((player) => new Player(player));
+    }
+    if (initialTeam.scores) {
+      this.scores = initialTeam.scores;
     }
   }
 
@@ -113,12 +122,13 @@ export class Player {
   name = '';
 
   constructor(initialPlayer: Partial<Player>) {
-    this.id = uuid();
-    if (initialPlayer.name) {
-      this.name = initialPlayer.name;
-    }
     if (initialPlayer.id) {
       this.id = initialPlayer.id;
+    } else {
+      this.id = uuid();
+    }
+    if (initialPlayer.name) {
+      this.name = initialPlayer.name;
     }
   }
 
