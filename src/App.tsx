@@ -44,6 +44,17 @@ function App() {
             >
               🗑
             </button>
+            <button
+              onClick={() =>
+                renameTeam({
+                  teamIndex,
+                  teamName: team.name,
+                  newName: prompt(`New name for ${team.name}`),
+                })
+              }
+            >
+              ✏️
+            </button>
           </div>
           <div>
             {team.players.map((player, playerIndex) => (
@@ -61,17 +72,42 @@ function App() {
                 >
                   🗑
                 </button>
+                <button
+                  onClick={() =>
+                    renamePlayer({
+                      teamIndex,
+                      playerIndex,
+                      newName: prompt(`New name for ${player.name}`),
+                    })
+                  }
+                >
+                  ✏️
+                </button>
                 {playerIndex !== team.players.length - 1 && <span>/</span>}
               </Fragment>
             ))}
           </div>
         </>
       ),
-      content: (rowData) => (
-        <>
-          {rowData[team.name]} / {rowData[runningTotalKey(team.name)]}
-        </>
-      ),
+      content: (rowData) => {
+        const score = rowData[team.name];
+        return (
+          <>
+            {score} / {rowData[runningTotalKey(team.name)]}
+            <button
+              onClick={() =>
+                editScore({
+                  teamIndex,
+                  scoreIndex: rowData.roundIndex,
+                  newScore: Number(prompt(`Old score: ${score}, New score:`)),
+                })
+              }
+            >
+              ✏️
+            </button>
+          </>
+        );
+      },
     });
   });
 
@@ -100,6 +136,21 @@ function App() {
     if (confirm(`Remove team ${teamName}?`)) {
       updateGame(() => game.removeTeam(teamIndex));
     }
+  }
+
+  function renameTeam({
+    teamIndex,
+    teamName,
+    newName,
+  }: {
+    teamIndex: number;
+    teamName: string;
+    newName: string | null;
+  }) {
+    if (!newName) {
+      return;
+    }
+    updateGame(() => game.teams[teamIndex].updateName(newName || teamName));
   }
 
   // ----------------------------------------
@@ -140,15 +191,32 @@ function App() {
     }
   }
 
+  function renamePlayer({
+    teamIndex,
+    playerIndex,
+    newName,
+  }: {
+    teamIndex: number;
+    playerIndex: number;
+    newName: string | null;
+  }) {
+    if (!newName) {
+      return;
+    }
+    updateGame(() => {
+      game.teams[teamIndex].players[playerIndex].updateName(newName);
+    });
+  }
+
   // ----------------------------------------
-  // submit score/ skip players
+  // submit/edit score
   // ----------------------------------------
   const currentScoreForm = useRef<HTMLFormElement>(null);
   function submitCurrentTeamScore(e: FormEvent) {
     e.preventDefault();
     const formData = new FormData(e.target! as HTMLFormElement);
     const score = Number(formData.get('score'));
-    if (typeof score !== 'number') {
+    if (typeof score !== 'number' || isNaN(score)) {
       console.log('score is not a number');
       return;
     }
@@ -156,6 +224,28 @@ function App() {
     currentScoreForm.current?.reset();
   }
 
+  function editScore({
+    teamIndex,
+    scoreIndex,
+    newScore,
+  }: {
+    teamIndex: number;
+    scoreIndex: number;
+    newScore: number;
+  }) {
+    if (typeof newScore !== 'number' || isNaN(newScore)) {
+      console.log('score is not a number');
+      return;
+    }
+    if (newScore < 0 || newScore > 12) {
+      return;
+    }
+    updateGame(() => (game.teams[teamIndex].scores[scoreIndex] = newScore));
+  }
+
+  // ----------------------------------------
+  // skip player
+  // ----------------------------------------
   function skipPlayer() {
     updateGame(() => game.nextPlayer());
   }
