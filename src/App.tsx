@@ -83,11 +83,10 @@ function App() {
     e.preventDefault();
     const formData = new FormData(e.target! as HTMLFormElement);
     const name = formData.get('name');
-    if (!name) {
-      return;
-    }
 
-    updateGame(() => game.addTeam(name as string));
+    updateGame(() =>
+      game.addTeam((name as string) || `Team ${game.teams.length + 1}`)
+    );
     newTeamForm.current?.reset();
   }
 
@@ -168,27 +167,38 @@ function App() {
     <div className="App">
       <header className=""></header>
 
-      <DataTable columns={columns} data={mappedGame} className="table" />
+      {game.teams.length > 0 && (
+        <>
+          <DataTable columns={columns} data={mappedGame} className="table" />
 
-      {game.whosNext && <div>Next Player 2: {game.whosNext?.name}</div>}
+          {game.whosNext && <div>Next Player: {game.whosNext?.name}</div>}
+
+          <div>
+            <form onSubmit={submitCurrentTeamScore} ref={currentScoreForm}>
+              <input type="number" name="score" min={0} max={12} />
+              <button type="submit">Submit</button>
+            </form>
+          </div>
+
+          <div>
+            <button onClick={skipPlayer}>Skip Player</button>
+          </div>
+        </>
+      )}
 
       <div>
-        <form onSubmit={submitCurrentTeamScore} ref={currentScoreForm}>
-          <input type="number" name="score" min={0} max={12} />
-          <button type="submit">Submit</button>
-        </form>
-      </div>
-      <div>
-        <button onClick={skipPlayer}>Skip Player</button>
-      </div>
-
-      <div>
+        <div>New Team</div>
         <form onSubmit={submitNewTeam} ref={newTeamForm}>
-          <input type="text" name="name" placeholder="New Team Name" />
+          <input
+            type="text"
+            name="name"
+            placeholder={`Team ${game.teams.length + 1}`}
+          />
           <button type="submit">Submit</button>
         </form>
       </div>
       <div>
+        <div>New Player</div>
         <form onSubmit={submitNewPlayer} ref={newPlayerForm}>
           <input type="text" name="name" placeholder="New Player Name" />
           <select name="team">
