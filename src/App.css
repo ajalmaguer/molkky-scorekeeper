@@ -1,11 +1,29 @@
-.table {
-  border: 1px solid red;
-  border-collapse: collapse;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    --bottom-height: 100px;
+  }
 }
 
-.table th,
-.table td {
-  margin: 0;
-  padding: 0 10px;
-  border: 1px solid red;
+@layer components {
+  .container {
+    @apply m-5;
+    --bottom-height: 100px;
+  }
+
+  .top {
+    @apply overflow-scroll -mx-5 px-5;
+    margin-bottom: calc(var(--bottom-height) + 1.5rem);
+  }
+
+  .bottom {
+    @apply border border-red-400;
+    @apply fixed bottom-0 left-0 right-0 bg-white;
+    transition: height 0.3s;
+    height: var(--bottom-height);
+  }
 }

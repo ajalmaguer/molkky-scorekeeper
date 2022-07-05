@@ -1,6 +1,11 @@
-import { FormEvent, Fragment, useRef, useState } from 'react';
+import { FormEvent, Fragment, useEffect, useRef, useState } from 'react';
+import { FaEllipsisH } from 'react-icons/fa';
 import './App.css';
+import { NextPlayerScoreForm } from './components/NextPlayerScoreForm';
+import { PlayerButton } from './components/PlayerButton';
+import { TeamButton } from './components/TeamButton';
 import { Column, DataTable } from './data_table';
+
 import { LocalStorageService } from './localStorageService';
 import { GameDataRow, mapGame, runningTotalKey } from './mapGame';
 
@@ -22,19 +27,25 @@ function App() {
   // ----------------------------------------
   const columns: Column<GameDataRow>[] = [
     {
+      className: 'p-2 border border-gray-500',
       header: '',
       content: (rowData) => {
-        return <>Round {rowData.roundIndex + 1}</>;
+        return (
+          <span className="whitespace-nowrap">
+            Round {rowData.roundIndex + 1}
+          </span>
+        );
       },
     },
   ];
   game.teams.forEach((team, teamIndex) => {
     columns.push({
+      className: 'border border-gray-500 text-center py-4 px-2',
       header: (
         <>
-          <div>
-            {team.name}{' '}
-            <button
+          <div className="mb-2">
+            <TeamButton team={team} />
+            {/* <button
               onClick={() =>
                 removeTeam({
                   teamIndex,
@@ -43,7 +54,9 @@ function App() {
               }
             >
               🗑
-            </button>
+            </button> */}
+            {/* 
+            
             <button
               onClick={() =>
                 renameTeam({
@@ -54,13 +67,16 @@ function App() {
               }
             >
               ✏️
-            </button>
+            </button> */}
           </div>
-          <div>
+          <div style={{ whiteSpace: 'nowrap' }}>
             {team.players.map((player, playerIndex) => (
               <Fragment key={playerIndex}>
-                <span>{player.name}</span>
-                <button
+                <PlayerButton
+                  player={player}
+                  isNext={game.whosNext?.name === player.name}
+                />
+                {/* <button
                   onClick={() =>
                     removePlayer({
                       teamIndex,
@@ -71,8 +87,8 @@ function App() {
                   }
                 >
                   🗑
-                </button>
-                <button
+                </button> */}
+                {/* <button
                   onClick={() =>
                     renamePlayer({
                       teamIndex,
@@ -82,8 +98,8 @@ function App() {
                   }
                 >
                   ✏️
-                </button>
-                {playerIndex !== team.players.length - 1 && <span>/</span>}
+                </button> */}
+                {playerIndex !== team.players.length - 1 && <span> / </span>}
               </Fragment>
             ))}
           </div>
@@ -92,20 +108,24 @@ function App() {
       content: (rowData) => {
         const score = rowData[team.name];
         return (
-          <>
-            {score} / {rowData[runningTotalKey(team.name)]}
+          <div className="whitespace-nowrap flex justify-center items-center">
+            <div className="mr-3">
+              {score} / {rowData[runningTotalKey(team.name)]}
+            </div>
+
             <button
-              onClick={() =>
-                editScore({
-                  teamIndex,
-                  scoreIndex: rowData.roundIndex,
-                  newScore: Number(prompt(`Old score: ${score}, New score:`)),
-                })
-              }
+              className="border border-violet-300 px-2 py-1 rounded-full transition-colors active:bg-violet-200"
+              onClick={() => {
+                // editScore({
+                //   teamIndex,
+                //   scoreIndex: rowData.roundIndex,
+                //   newScore: Number(prompt(`Old score: ${score}, New score:`)),
+                // })
+              }}
             >
-              ✏️
+              <FaEllipsisH />
             </button>
-          </>
+          </div>
         );
       },
     });
@@ -211,17 +231,8 @@ function App() {
   // ----------------------------------------
   // submit/edit score
   // ----------------------------------------
-  const currentScoreForm = useRef<HTMLFormElement>(null);
-  function submitCurrentTeamScore(e: FormEvent) {
-    e.preventDefault();
-    const formData = new FormData(e.target! as HTMLFormElement);
-    const score = Number(formData.get('score'));
-    if (typeof score !== 'number' || isNaN(score)) {
-      console.log('score is not a number');
-      return;
-    }
+  function submitCurrentTeamScore(score: number) {
     updateGame(() => game.submitScoreForCurrentTeam(score));
-    currentScoreForm.current?.reset();
   }
 
   function editScore({
@@ -251,32 +262,71 @@ function App() {
   }
 
   // ----------------------------------------
+  // rendered sections
+  // ----------------------------------------
+  const dataTable = (
+    <DataTable columns={columns} data={mappedGame} className="" />
+  );
+
+  const nextForm = (
+    <div className="">
+      {/* <div className=''></div> */}
+      {game.whosNext && <div>Next Player: {game.whosNext?.name}</div>}
+
+      <NextPlayerScoreForm onSubmit={submitCurrentTeamScore} />
+    </div>
+  );
+
+  const [expand, setExpand] = useState(false);
+  function handleExpand() {
+    setExpand(!expand);
+  }
+
+  useEffect(() => {
+    (document.querySelector('.container') as any).style.setProperty(
+      '--bottom-height',
+      expand ? '200px' : '100px'
+    );
+  }, [expand]);
+
+  // ----------------------------------------
   // render
   // ----------------------------------------
   return (
-    <div className="App">
+    <>
+      <div className="container">
+        <div className="top">{dataTable}</div>
+        <div className="bottom">
+          <button onClick={handleExpand}>expand</button>
+          {nextForm}
+        </div>
+      </div>
+    </>
+  );
+
+  return (
+    <div className="m-5">
       <header className=""></header>
 
       {game.teams.length > 0 && (
         <>
-          <DataTable columns={columns} data={mappedGame} className="table" />
-
-          {game.whosNext && <div>Next Player: {game.whosNext?.name}</div>}
-
-          <div>
-            <form onSubmit={submitCurrentTeamScore} ref={currentScoreForm}>
-              <input type="number" name="score" min={0} max={12} />
-              <button type="submit">Submit</button>
-            </form>
+          <div className="overflow-x-scroll -mx-5 p-5">
+            <DataTable columns={columns} data={mappedGame} className="table" />
           </div>
 
-          <div>
+          <div className="border border-red fixed bottom-0 left-0 right-0 h-[100px] bg-white flex flex-col justify-center items-center">
+            {game.whosNext && <div>Next Player: {game.whosNext?.name}</div>}
+
+            <NextPlayerScoreForm onSubmit={submitCurrentTeamScore} />
+          </div>
+
+          {/* <div>
             <button onClick={skipPlayer}>Skip Player</button>
-          </div>
+          </div> */}
         </>
       )}
 
-      <div>
+      {/* <div>
         <div>New Team</div>
         <form onSubmit={submitNewTeam} ref={newTeamForm}>
           <input
@@ -286,8 +336,8 @@ function App() {
           />
           <button type="submit">Submit</button>
         </form>
-      </div>
-      <div>
+      </div> */}
+      {/* <div>
         <div>New Player</div>
         <form onSubmit={submitNewPlayer} ref={newPlayerForm}>
           <input type="text" name="name" placeholder="New Player Name" />
@@ -300,7 +350,7 @@ function App() {
           </select>
           <button type="submit">Submit</button>
         </form>
-      </div>
+      </div> */}
     </div>
   );
 }
