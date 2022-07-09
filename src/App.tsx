@@ -1,3 +1,4 @@
+import { Button } from '@material-tailwind/react';
 import { FormEvent, Fragment, useEffect, useRef, useState } from 'react';
 import { FaEllipsisH } from 'react-icons/fa';
 import './App.css';
@@ -44,30 +45,13 @@ function App() {
       header: (
         <>
           <div className="mb-2">
-            <TeamButton team={team} />
-            {/* <button
-              onClick={() =>
-                removeTeam({
-                  teamIndex,
-                  teamName: team.name,
-                })
-              }
-            >
-              🗑
-            </button> */}
-            {/* 
-            
-            <button
-              onClick={() =>
-                renameTeam({
-                  teamIndex,
-                  teamName: team.name,
-                  newName: prompt(`New name for ${team.name}`),
-                })
-              }
-            >
-              ✏️
-            </button> */}
+            <TeamButton
+              team={team}
+              onRename={(newName) => {
+                renameTeam({ teamIndex, newName });
+              }}
+              onDelete={() => removeTeam({ teamIndex })}
+            />
           </div>
           <div style={{ whiteSpace: 'nowrap' }}>
             {team.players.map((player, playerIndex) => (
@@ -130,47 +114,46 @@ function App() {
       },
     });
   });
+  columns.push({
+    className: 'border border-gray-500 text-center py-4 px-2',
+    header: (
+      <>
+        <Button
+          className="whitespace-nowrap"
+          onClick={() => {
+            const newTeamName = prompt('New Team Name (optional)');
+            submitNewTeam(newTeamName);
+          }}
+        >
+          Add a Team
+        </Button>
+      </>
+    ),
+    content: () => <></>,
+  });
 
   // ----------------------------------------
   // add/remove teams
   // ----------------------------------------
-  const newTeamForm = useRef<HTMLFormElement>(null);
-  function submitNewTeam(e: FormEvent) {
-    e.preventDefault();
-    const formData = new FormData(e.target! as HTMLFormElement);
-    const name = formData.get('name');
-
-    updateGame(() =>
-      game.addTeam((name as string) || `Team ${game.teams.length + 1}`)
-    );
-    newTeamForm.current?.reset();
+  function submitNewTeam(name: string | null) {
+    updateGame(() => game.addTeam(name || `Team ${game.teams.length + 1}`));
   }
 
-  function removeTeam({
-    teamIndex,
-    teamName,
-  }: {
-    teamIndex: number;
-    teamName: string;
-  }) {
-    if (confirm(`Remove team ${teamName}?`)) {
-      updateGame(() => game.removeTeam(teamIndex));
-    }
+  function removeTeam({ teamIndex }: { teamIndex: number }) {
+    updateGame(() => game.removeTeam(teamIndex));
   }
 
   function renameTeam({
     teamIndex,
-    teamName,
     newName,
   }: {
     teamIndex: number;
-    teamName: string;
     newName: string | null;
   }) {
     if (!newName) {
       return;
     }
-    updateGame(() => game.teams[teamIndex].updateName(newName || teamName));
+    updateGame(() => game.teams[teamIndex].updateName(newName));
   }
 
   // ----------------------------------------

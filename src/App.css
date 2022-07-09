@@ -26,4 +26,9 @@
     transition: height 0.3s;
     height: var(--bottom-height);
   }
+
+  button {
+    border-radius: 99999px !important;
+    text-transform: none !important;
+  }
 }
