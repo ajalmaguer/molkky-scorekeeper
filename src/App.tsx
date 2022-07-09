@@ -2,6 +2,10 @@ import { Button } from '@material-tailwind/react';
 import { FormEvent, Fragment, useEffect, useRef, useState } from 'react';
 import { FaEllipsisH } from 'react-icons/fa';
 import './App.css';
+import {
+  indexToButtonColor,
+  indexToTextColor,
+} from './components/indexToColor';
 import { NextPlayerScoreForm } from './components/NextPlayerScoreForm';
 import { PlayerButton } from './components/PlayerButton';
 import { TeamButton } from './components/TeamButton';
@@ -30,9 +34,11 @@ function App() {
     {
       className: 'p-2 border border-gray-500',
       header: '',
-      content: (rowData) => {
+      content: (rowData, index) => {
         return (
-          <span className="whitespace-nowrap">
+          <span
+            className={['whitespace-nowrap', indexToTextColor(index)].join(' ')}
+          >
             Round {rowData.roundIndex + 1}
           </span>
         );
@@ -46,11 +52,15 @@ function App() {
         <>
           <div className="mb-2">
             <TeamButton
+              teamIndex={teamIndex}
               team={team}
               onRename={(newName) => {
                 renameTeam({ teamIndex, newName });
               }}
               onDelete={() => removeTeam({ teamIndex })}
+              onAddPlayer={(playerName) =>
+                createNewPlayer({ teamIndex, playerName })
+              }
             />
           </div>
           <div style={{ whiteSpace: 'nowrap' }}>
@@ -120,6 +130,7 @@ function App() {
       <>
         <Button
           className="whitespace-nowrap"
+          color={indexToButtonColor(game.teams.length)}
           onClick={() => {
             const newTeamName = prompt('New Team Name (optional)');
             submitNewTeam(newTeamName);
@@ -159,21 +170,14 @@ function App() {
   // ----------------------------------------
   // add/remove players
   // ----------------------------------------
-  const newPlayerForm = useRef<HTMLFormElement>(null);
-  function submitNewPlayer(e: FormEvent) {
-    e.preventDefault();
-    const formData = new FormData(e.target! as HTMLFormElement);
-    const name = formData.get('name');
-    const team = formData.get('team');
-    if (!name || !team) {
-      return;
-    }
-    console.log({ name, team });
-
-    updateGame(() =>
-      game.teams[parseInt(team as string)].addPlayer(name as string)
-    );
-    newPlayerForm.current?.reset();
+  function createNewPlayer({
+    teamIndex,
+    playerName,
+  }: {
+    teamIndex: number;
+    playerName: string;
+  }) {
+    updateGame(() => game.teams[teamIndex].addPlayer(playerName));
   }
 
   function removePlayer({
