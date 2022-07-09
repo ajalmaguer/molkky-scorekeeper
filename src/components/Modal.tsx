@@ -6,8 +6,7 @@ export const Modal: FunctionComponent<{
   onClose: () => void;
   title: ReactNode;
   children: ReactNode;
-  initialFocus: any;
-}> = ({ isOpen, onClose, title, children, initialFocus }) => {
+}> = ({ isOpen, onClose, title, children }) => {
   return (
     <Dialog open={isOpen} handler={onClose} className="relative z-50" size="xl">
       <DialogHeader>{title}</DialogHeader>

@@ -1,11 +1,10 @@
 import { Button, Input } from '@material-tailwind/react';
 import { FormEvent, FunctionComponent, useRef } from 'react';
-import { Team } from '../game';
 
 export const NewPlayerForm: FunctionComponent<{
-  // team: Team;
+  initialNameValue?: string;
   onChange: (name: string) => void;
-}> = ({ onChange }) => {
+}> = ({ initialNameValue = '', onChange }) => {
   const formRef = useRef<HTMLFormElement>(null);
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -16,11 +15,18 @@ export const NewPlayerForm: FunctionComponent<{
 
     formRef.current?.reset();
   }
+  console.log({ initialNameValue });
 
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
       <div className="mb-2">
-        <Input size="lg" label="Player Name" name="name" autoFocus />
+        <Input
+          size="lg"
+          label="Player Name"
+          name="name"
+          defaultValue={initialNameValue}
+          autoFocus
+        />
       </div>
       <div className="flex justify-center">
         <Button
@@ -28,7 +34,6 @@ export const NewPlayerForm: FunctionComponent<{
           type="submit"
           className="rounded-full"
           color="light-blue"
-          defaultValue=""
         >
           Submit
         </Button>

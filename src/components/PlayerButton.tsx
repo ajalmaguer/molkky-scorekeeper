@@ -1,39 +1,71 @@
+import {
+  Button,
+  Tab,
+  TabPanel,
+  Tabs,
+  TabsBody,
+  TabsHeader,
+} from '@material-tailwind/react';
 import { FunctionComponent } from 'react';
 import { Player } from '../game';
+import { Modal } from './Modal';
+import { NewPlayerForm } from './NewPlayerForm';
+import { useModal } from './useModal';
 
 export const PlayerButton: FunctionComponent<{
   player: Player;
+  onRename: (newName: string) => void;
+  onDelete: () => void;
   isNext: boolean;
-}> = ({ player, isNext }) => {
+}> = ({ player, isNext, onRename, onDelete }) => {
+  const { isOpen, openModal, closeModal } = useModal();
+
   return (
     <>
-      <span
-        className={[
-          'inline-block',
-          'px-2',
-          'line',
-          'whitespace-nowrap',
-          'transition-colors',
-          'border border-gray-400 rounded-md',
-          isNext ? 'border-emerald-700 bg-emerald-100' : '',
-        ].join(' ')}
+      <Button
+        size="md"
+        color={isNext ? 'yellow' : 'blue-grey'}
+        variant={isNext ? 'filled' : 'outlined'}
+        className="!rounded-lg !py-2 !px-4"
+        onClick={openModal}
       >
         {player.name}
-      </span>
+        {isNext && <span> 🦄</span>}
+      </Button>
+
+      <Modal isOpen={isOpen} onClose={closeModal} title={player.name}>
+        <Tabs value="Rename" className="w-full">
+          <TabsHeader>
+            <Tab value="Rename">Rename</Tab>
+            <Tab value="Settings">Settings</Tab>
+          </TabsHeader>
+          <TabsBody>
+            <TabPanel value="Rename">
+              <NewPlayerForm
+                onChange={onRename}
+                initialNameValue={player.name}
+              />
+            </TabPanel>
+            <TabPanel value="Settings">
+              <div className="flex justify-center w-full">
+                <Button
+                  color="red"
+                  onClick={() => {
+                    // if (
+                    //   confirm('Are you sure you want to delete this player?')
+                    // ) {
+                    onDelete();
+                    closeModal();
+                    // }
+                  }}
+                >
+                  Delete Player
+                </Button>
+              </div>
+            </TabPanel>
+          </TabsBody>
+        </Tabs>
+      </Modal>
     </>
   );
 };
-
-/** 
- * display: inline-block;
-    padding: 0.25em 0.4em;
-    font-size: 75%;
-    font-weight: 700;
-    line-height: 1;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: baseline;
-    border-radius: 0.25rem;
-}
- * 
- */

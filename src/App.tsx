@@ -1,5 +1,5 @@
 import { Button } from '@material-tailwind/react';
-import { FormEvent, Fragment, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FaEllipsisH } from 'react-icons/fa';
 import './App.css';
 import {
@@ -50,7 +50,7 @@ function App() {
       className: 'border border-gray-500 text-center py-4 px-2',
       header: (
         <>
-          <div className="mb-2">
+          <div className="mb-4">
             <TeamButton
               teamIndex={teamIndex}
               team={team}
@@ -63,62 +63,34 @@ function App() {
               }
             />
           </div>
-          <div style={{ whiteSpace: 'nowrap' }}>
+          <div className="flex flex-wrap gap-3 justify-center min-w-[200px]">
             {team.players.map((player, playerIndex) => (
-              <Fragment key={playerIndex}>
+              <div key={playerIndex}>
                 <PlayerButton
                   player={player}
                   isNext={game.whosNext?.name === player.name}
+                  onRename={(newName) =>
+                    renamePlayer({ teamIndex, playerIndex, newName })
+                  }
+                  onDelete={() => {
+                    removePlayer({ teamIndex, playerIndex });
+                  }}
                 />
-                {/* <button
-                  onClick={() =>
-                    removePlayer({
-                      teamIndex,
-                      playerIndex,
-                      teamName: team.name,
-                      playerName: player.name,
-                    })
-                  }
-                >
-                  🗑
-                </button> */}
-                {/* <button
-                  onClick={() =>
-                    renamePlayer({
-                      teamIndex,
-                      playerIndex,
-                      newName: prompt(`New name for ${player.name}`),
-                    })
-                  }
-                >
-                  ✏️
-                </button> */}
-                {playerIndex !== team.players.length - 1 && <span> / </span>}
-              </Fragment>
+              </div>
             ))}
           </div>
         </>
       ),
-      content: (rowData) => {
+      content: (rowData, teamIndex) => {
         const score = rowData[team.name];
         return (
           <div className="whitespace-nowrap flex justify-center items-center">
-            <div className="mr-3">
+            <div className={['mr-3', indexToTextColor(teamIndex)].join(' ')}>
               {score} / {rowData[runningTotalKey(team.name)]}
             </div>
-
-            <button
-              className="border border-violet-300 px-2 py-1 rounded-full transition-colors active:bg-violet-200"
-              onClick={() => {
-                // editScore({
-                //   teamIndex,
-                //   scoreIndex: rowData.roundIndex,
-                //   newScore: Number(prompt(`Old score: ${score}, New score:`)),
-                // })
-              }}
-            >
+            <Button size="sm">
               <FaEllipsisH />
-            </button>
+            </Button>
           </div>
         );
       },
@@ -183,19 +155,13 @@ function App() {
   function removePlayer({
     teamIndex,
     playerIndex,
-    teamName,
-    playerName,
   }: {
     teamIndex: number;
     playerIndex: number;
-    teamName: string;
-    playerName: string;
   }) {
-    if (confirm(`Remove ${playerName} from ${teamName}?`)) {
-      updateGame(() => {
-        game.teams[teamIndex].removePlayer(playerIndex);
-      });
-    }
+    updateGame(() => {
+      game.teams[teamIndex].removePlayer(playerIndex);
+    });
   }
 
   function renamePlayer({
