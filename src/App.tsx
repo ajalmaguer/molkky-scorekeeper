@@ -283,7 +283,7 @@ function App() {
   }
 
   useEffect(() => {
-    (document.querySelector('.container') as any).style.setProperty(
+    (document.querySelector('.outside') as any)?.style.setProperty(
       '--bottom-height',
       expand ? '200px' : '100px'
     );
@@ -294,7 +294,7 @@ function App() {
   // ----------------------------------------
   return (
     <>
-      <div className="container">
+      <div className="outside">
         <div className="top">{dataTable}</div>
         <div className="bottom">
           <button onClick={handleExpand}>expand</button>

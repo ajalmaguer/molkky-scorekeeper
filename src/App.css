@@ -10,14 +10,14 @@
 }
 
 @layer components {
-  .container {
+  .outside {
     @apply m-5;
     --bottom-height: 100px;
   }
 
   .top {
     @apply overflow-scroll -mx-5 px-5;
-    margin-bottom: calc(var(--bottom-height) + 1.5rem);
+    padding-bottom: calc(var(--bottom-height) + 1.5rem);
   }
 
   .bottom {
