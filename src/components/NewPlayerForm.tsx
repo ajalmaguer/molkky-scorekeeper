@@ -15,7 +15,6 @@ export const NewPlayerForm: FunctionComponent<{
 
     formRef.current?.reset();
   }
-  console.log({ initialNameValue });
 
   return (
     <form onSubmit={handleSubmit} ref={formRef}>

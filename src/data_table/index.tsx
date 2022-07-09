@@ -47,7 +47,7 @@ export function DataTable<T>({
 
   return (
     <>
-      <table className={`fern-data-table ${className}`}>
+      <table className={`${className}`}>
         <thead>
           <tr>
             {columns.map((col, i) => (

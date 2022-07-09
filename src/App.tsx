@@ -1,19 +1,18 @@
 import { Button, Progress } from '@material-tailwind/react';
-import { useEffect, useRef, useState } from 'react';
-import { FaEllipsisH } from 'react-icons/fa';
+import { useRef, useState } from 'react';
 import './App.css';
 import {
   indexToButtonColor,
   indexToTextColor,
 } from './components/indexToColor';
-import { EditScoreForm, NewScoreForm } from './components/ScoreForms';
 import { PlayerButton } from './components/PlayerButton';
+import { NewScoreForm } from './components/ScoreForms';
 import { TeamButton } from './components/TeamButton';
 import { Column, DataTable } from './data_table';
 
+import { ScoreButton } from './components/ScoreButton';
 import { LocalStorageService } from './localStorageService';
 import { GameDataRow, mapGame, runningTotalKey } from './mapGame';
-import { ScoreButton } from './components/ScoreButton';
 
 function App() {
   const { current: game } = useRef(LocalStorageService.getGame());
@@ -243,7 +242,6 @@ function App() {
     <DataTable columns={columns} data={mappedGame} className="" />
   );
 
-  console.log(game.whosNext);
   const nextForm = (
     <div className="p-3">
       {game.whosNext && (
