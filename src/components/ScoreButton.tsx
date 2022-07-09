@@ -9,8 +9,8 @@ import { indexToButtonColor } from './indexToColor';
 export const ScoreButton: FunctionComponent<{
   score: number;
   onEdit: (newScore: number) => void;
-  teamIndex: number;
-}> = ({ score, onEdit, teamIndex }) => {
+  indexForButton: number;
+}> = ({ score, onEdit, indexForButton }) => {
   const { isOpen, openModal, closeModal } = useModal();
 
   return (
@@ -18,7 +18,7 @@ export const ScoreButton: FunctionComponent<{
       <Button
         size="sm"
         onClick={openModal}
-        color={indexToButtonColor(teamIndex)}
+        color={indexToButtonColor(indexForButton)}
       >
         <FaEllipsisH />
       </Button>

@@ -95,6 +95,14 @@ describe('scoring', () => {
     expect(game.teams[0].totalScore).toEqual(12);
   });
 
+  it('calculates score correctly if you go over 50', () => {
+    const game = new Game({});
+    game.addTeam('Team 1');
+    game.teams[0].addScore(49);
+    game.teams[0].addScore(2);
+    expect(game.teams[0].totalScore).toEqual(25);
+  });
+
   it('you can edit scores', () => {
     const game = new Game({});
     game.addTeam('Team 1');

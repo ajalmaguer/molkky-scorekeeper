@@ -64,7 +64,7 @@ function App() {
               }
             />
           </div>
-          <div className="flex flex-wrap gap-3 justify-center min-w-[200px] mb-3">
+          <div className="flex flex-wrap gap-3 justify-center min-w-[200px] mb-4">
             {team.players.map((player, playerIndex) => (
               <div key={playerIndex}>
                 <PlayerButton
@@ -81,14 +81,25 @@ function App() {
             ))}
           </div>
           <div>
-            <Progress
-              value={(team.totalScore / 50) * 100}
-              color={indexToButtonColor(teamIndex)}
-            />
+            {team.totalScore === 50 ? (
+              <>
+                <div>🎉🥳 50 Points! 🎊🦄</div>
+              </>
+            ) : (
+              <>
+                <div>
+                  {50 - team.totalScore} to win
+                  <Progress
+                    value={(team.totalScore / 50) * 100}
+                    color={indexToButtonColor(teamIndex)}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </>
       ),
-      content: (rowData, teamIndex) => {
+      content: (rowData) => {
         const score = rowData[team.name];
         return (
           <div className="whitespace-nowrap flex justify-center items-center">
@@ -97,14 +108,14 @@ function App() {
             </div>
             <ScoreButton
               score={score}
-              onEdit={(newScore) =>
+              onEdit={(newScore) => {
                 editScore({
                   teamIndex,
                   scoreIndex: rowData.roundIndex,
                   newScore,
-                })
-              }
-              teamIndex={teamIndex}
+                });
+              }}
+              indexForButton={rowData.roundIndex}
             />
           </div>
         );
@@ -215,8 +226,7 @@ function App() {
     if (newScore < 0 || newScore > 12) {
       return;
     }
-    console.log(teamIndex, game.teams[teamIndex]);
-    // updateGame(() => (game.teams[teamIndex].scores[scoreIndex] = newScore));
+    updateGame(() => (game.teams[teamIndex].scores[scoreIndex] = newScore));
   }
 
   // ----------------------------------------
@@ -233,6 +243,7 @@ function App() {
     <DataTable columns={columns} data={mappedGame} className="" />
   );
 
+  console.log(game.whosNext);
   const nextForm = (
     <div className="p-3">
       {game.whosNext && (

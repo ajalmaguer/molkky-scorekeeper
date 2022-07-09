@@ -99,7 +99,16 @@ export class Team {
   }
 
   get totalScore(): number {
-    return this.scores.reduce((prev, curr) => prev + curr, 0);
+    let runningTotal = 0;
+
+    this.scores.forEach((score) => {
+      runningTotal += score;
+      if (runningTotal > 50) {
+        runningTotal = 25;
+      }
+    });
+
+    return runningTotal;
   }
 
   get scoresForDisplay(): ScoreForDisplay[] {
