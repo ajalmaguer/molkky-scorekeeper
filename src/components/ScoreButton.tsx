@@ -1,21 +1,37 @@
 import { Button } from '@material-tailwind/react';
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { FaEllipsisH } from 'react-icons/fa';
-import { runningTotalKey } from '../mapGame';
-import { indexToTextColor } from './indexToColor';
+import { EditScoreForm } from './ScoreForms';
 import { Modal } from './Modal';
 import { useModal } from './useModal';
+import { indexToButtonColor } from './indexToColor';
 
-export const ScoreButton: FunctionComponent<{}> = ({}) => {
+export const ScoreButton: FunctionComponent<{
+  score: number;
+  onEdit: (newScore: number) => void;
+  teamIndex: number;
+}> = ({ score, onEdit, teamIndex }) => {
   const { isOpen, openModal, closeModal } = useModal();
 
   return (
     <>
-      <Button size="sm">
+      <Button
+        size="sm"
+        onClick={openModal}
+        color={indexToButtonColor(teamIndex)}
+      >
         <FaEllipsisH />
       </Button>
-      <Modal>
-        
+      <Modal isOpen={isOpen} onClose={closeModal} title="Edit Score">
+        <div className="w-full">
+          <EditScoreForm
+            initialScore={score}
+            onSubmit={(newScore) => {
+              onEdit(newScore);
+              closeModal();
+            }}
+          />
+        </div>
       </Modal>
     </>
   );

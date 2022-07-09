@@ -1,4 +1,4 @@
-import { Button } from '@material-tailwind/react';
+import { Button, Progress } from '@material-tailwind/react';
 import { useEffect, useRef, useState } from 'react';
 import { FaEllipsisH } from 'react-icons/fa';
 import './App.css';
@@ -6,13 +6,14 @@ import {
   indexToButtonColor,
   indexToTextColor,
 } from './components/indexToColor';
-import { NextPlayerScoreForm } from './components/NextPlayerScoreForm';
+import { EditScoreForm, NewScoreForm } from './components/ScoreForms';
 import { PlayerButton } from './components/PlayerButton';
 import { TeamButton } from './components/TeamButton';
 import { Column, DataTable } from './data_table';
 
 import { LocalStorageService } from './localStorageService';
 import { GameDataRow, mapGame, runningTotalKey } from './mapGame';
+import { ScoreButton } from './components/ScoreButton';
 
 function App() {
   const { current: game } = useRef(LocalStorageService.getGame());
@@ -63,7 +64,7 @@ function App() {
               }
             />
           </div>
-          <div className="flex flex-wrap gap-3 justify-center min-w-[200px]">
+          <div className="flex flex-wrap gap-3 justify-center min-w-[200px] mb-3">
             {team.players.map((player, playerIndex) => (
               <div key={playerIndex}>
                 <PlayerButton
@@ -79,6 +80,12 @@ function App() {
               </div>
             ))}
           </div>
+          <div>
+            <Progress
+              value={(team.totalScore / 50) * 100}
+              color={indexToButtonColor(teamIndex)}
+            />
+          </div>
         </>
       ),
       content: (rowData, teamIndex) => {
@@ -88,9 +95,17 @@ function App() {
             <div className={['mr-3', indexToTextColor(teamIndex)].join(' ')}>
               {score} / {rowData[runningTotalKey(team.name)]}
             </div>
-            <Button size="sm">
-              <FaEllipsisH />
-            </Button>
+            <ScoreButton
+              score={score}
+              onEdit={(newScore) =>
+                editScore({
+                  teamIndex,
+                  scoreIndex: rowData.roundIndex,
+                  newScore,
+                })
+              }
+              teamIndex={teamIndex}
+            />
           </div>
         );
       },
@@ -197,14 +212,11 @@ function App() {
     scoreIndex: number;
     newScore: number;
   }) {
-    if (typeof newScore !== 'number' || isNaN(newScore)) {
-      console.log('score is not a number');
-      return;
-    }
     if (newScore < 0 || newScore > 12) {
       return;
     }
-    updateGame(() => (game.teams[teamIndex].scores[scoreIndex] = newScore));
+    console.log(teamIndex, game.teams[teamIndex]);
+    // updateGame(() => (game.teams[teamIndex].scores[scoreIndex] = newScore));
   }
 
   // ----------------------------------------
@@ -222,25 +234,17 @@ function App() {
   );
 
   const nextForm = (
-    <div className="">
-      {/* <div className=''></div> */}
-      {game.whosNext && <div>Next Player: {game.whosNext?.name}</div>}
+    <div className="p-3">
+      {game.whosNext && (
+        <div className="mb-2">Next Player: {game.whosNext?.name}</div>
+      )}
 
-      <NextPlayerScoreForm onSubmit={submitCurrentTeamScore} />
+      <NewScoreForm
+        onSubmit={submitCurrentTeamScore}
+        teamIndex={game.currentTeamIndex}
+      />
     </div>
   );
-
-  const [expand, setExpand] = useState(false);
-  function handleExpand() {
-    setExpand(!expand);
-  }
-
-  useEffect(() => {
-    (document.querySelector('.outside') as any)?.style.setProperty(
-      '--bottom-height',
-      expand ? '200px' : '100px'
-    );
-  }, [expand]);
 
   // ----------------------------------------
   // render
@@ -249,62 +253,9 @@ function App() {
     <>
       <div className="outside">
         <div className="top">{dataTable}</div>
-        <div className="bottom">
-          <button onClick={handleExpand}>expand</button>
-          {nextForm}
-        </div>
+        <div className="bottom">{nextForm}</div>
       </div>
     </>
-  );
-
-  return (
-    <div className="m-5">
-      <header className=""></header>
-
-      {game.teams.length > 0 && (
-        <>
-          <div className="overflow-x-scroll -mx-5 p-5">
-            <DataTable columns={columns} data={mappedGame} className="table" />
-          </div>
-
-          <div className="border border-red fixed bottom-0 left-0 right-0 h-[100px] bg-white flex flex-col justify-center items-center">
-            {game.whosNext && <div>Next Player: {game.whosNext?.name}</div>}
-
-            <NextPlayerScoreForm onSubmit={submitCurrentTeamScore} />
-          </div>
-
-          {/* <div>
-            <button onClick={skipPlayer}>Skip Player</button>
-          </div> */}
-        </>
-      )}
-
-      {/* <div>
-        <div>New Team</div>
-        <form onSubmit={submitNewTeam} ref={newTeamForm}>
-          <input
-            type="text"
-            name="name"
-            placeholder={`Team ${game.teams.length + 1}`}
-          />
-          <button type="submit">Submit</button>
-        </form>
-      </div> */}
-      {/* <div>
-        <div>New Player</div>
-        <form onSubmit={submitNewPlayer} ref={newPlayerForm}>
-          <input type="text" name="name" placeholder="New Player Name" />
-          <select name="team">
-            {game.teams.map((team, index) => (
-              <option value={index} key={index}>
-                {team.name}
-              </option>
-            ))}
-          </select>
-          <button type="submit">Submit</button>
-        </form>
-      </div> */}
-    </div>
   );
 }
 
