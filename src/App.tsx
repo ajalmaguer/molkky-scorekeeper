@@ -13,6 +13,7 @@ import { Column, DataTable } from './data_table';
 import { ScoreButton } from './components/ScoreButton';
 import { LocalStorageService } from './localStorageService';
 import { GameDataRow, mapGame, runningTotalKey } from './mapGame';
+import useWindowDimensions from './components/useWindowDimensions';
 
 function App() {
   const { current: game } = useRef(LocalStorageService.getGame());
@@ -32,7 +33,7 @@ function App() {
   // ----------------------------------------
   const columns: Column<GameDataRow>[] = [
     {
-      className: 'p-2 border border-gray-500',
+      className: 'p-2',
       header: '',
       content: (rowData, index) => {
         return (
@@ -47,9 +48,9 @@ function App() {
   ];
   game.teams.forEach((team, teamIndex) => {
     columns.push({
-      className: 'border border-gray-500 text-center py-4 px-2',
+      className: 'text-center py-4 px-2',
       header: (
-        <>
+        <div className="">
           <div className="mb-4">
             <TeamButton
               teamIndex={teamIndex}
@@ -68,7 +69,10 @@ function App() {
               <div key={playerIndex}>
                 <PlayerButton
                   player={player}
-                  isNext={game.whosNext?.name === player.name}
+                  isNext={
+                    game.whosNext?.name === player.name &&
+                    game.currentTeamIndex === teamIndex
+                  }
                   onRename={(newName) =>
                     renamePlayer({ teamIndex, playerIndex, newName })
                   }
@@ -96,13 +100,17 @@ function App() {
               </>
             )}
           </div>
-        </>
+        </div>
       ),
       content: (rowData) => {
         const score = rowData[team.name];
         return (
           <div className="whitespace-nowrap flex justify-center items-center">
-            <div className={['mr-3', indexToTextColor(teamIndex)].join(' ')}>
+            <div
+              className={['mr-3', indexToTextColor(rowData.roundIndex)].join(
+                ' '
+              )}
+            >
               {score} / {rowData[runningTotalKey(team.name)]}
             </div>
             <ScoreButton
@@ -122,7 +130,7 @@ function App() {
     });
   });
   columns.push({
-    className: 'border border-gray-500 text-center py-4 px-2',
+    className: 'text-center py-4 px-2',
     header: (
       <>
         <Button
@@ -255,14 +263,22 @@ function App() {
     </div>
   );
 
+  const { height } = useWindowDimensions();
+  const ref = useRef<HTMLDivElement>(null);
+  const maxHeight = `calc(${height}px - ${ref.current?.clientHeight || 100}px)`;
+
   // ----------------------------------------
   // render
   // ----------------------------------------
   return (
     <>
       <div className="outside">
-        <div className="top">{dataTable}</div>
-        <div className="bottom">{nextForm}</div>
+        <div className="top" style={{ maxHeight }}>
+          <div className="table-container">{dataTable}</div>
+        </div>
+        <div className="bottom" ref={ref}>
+          {nextForm}
+        </div>
       </div>
     </>
   );
