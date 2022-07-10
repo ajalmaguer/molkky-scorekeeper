@@ -42,6 +42,7 @@ export const EditScoreForm: FunctionComponent<{
             max={12}
             defaultValue={initialScore}
             autoFocus
+            required
           />
         </div>
         <div className="flex justify-center">
@@ -68,7 +69,6 @@ export const NewScoreForm: FunctionComponent<{
               size="lg"
               min={0}
               max={12}
-              autoFocus
               required
             />
           </div>

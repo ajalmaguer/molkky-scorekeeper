@@ -21,11 +21,11 @@ export const Modal: FunctionComponent<{
       className="relative z-50"
       size={size}
     >
+      <DialogHeader>{title}</DialogHeader>
+      <DialogBody>{children}</DialogBody>
       <button onClick={onClose} className="absolute top-4 right-4 text-xl">
         <AiFillCloseCircle />
       </button>
-      <DialogHeader>{title}</DialogHeader>
-      <DialogBody>{children}</DialogBody>
     </Dialog>
   );
 };
