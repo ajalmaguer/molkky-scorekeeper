@@ -14,6 +14,7 @@ import { ScoreButton } from './components/ScoreButton';
 import { LocalStorageService } from './localStorageService';
 import { GameDataRow, mapGame, runningTotalKey } from './mapGame';
 import useWindowDimensions from './components/useWindowDimensions';
+import { Title } from './components/Title';
 
 function App() {
   const { current: game } = useRef(LocalStorageService.getGame());
@@ -64,7 +65,7 @@ function App() {
               }
             />
           </div>
-          <div className="flex flex-wrap gap-3 justify-center min-w-[200px] mb-4">
+          <div className="flex flex-wrap gap-3 justify-center min-w-[150px] mb-4">
             {team.players.map((player, playerIndex) => (
               <div key={playerIndex}>
                 <PlayerButton
@@ -130,7 +131,7 @@ function App() {
     });
   });
   columns.push({
-    className: 'text-center py-4 px-2',
+    className: 'text-center py-4 px-2 w-full',
     header: (
       <>
         <Button
@@ -251,7 +252,7 @@ function App() {
   );
 
   const nextForm = (
-    <div className="p-3">
+    <>
       {game.whosNext && (
         <div className="mb-2">Next Player: {game.whosNext?.name}</div>
       )}
@@ -260,7 +261,7 @@ function App() {
         onSubmit={submitCurrentTeamScore}
         teamIndex={game.currentTeamIndex}
       />
-    </div>
+    </>
   );
 
   const { height } = useWindowDimensions();
@@ -270,11 +271,19 @@ function App() {
   // ----------------------------------------
   // render
   // ----------------------------------------
+  if (game.teams.length === 0) {
+    return (
+      <div>
+        <Title />
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="outside">
         <div className="top" style={{ maxHeight }}>
-          <h1 className="m-3 text-2xl text-center">Mölkky Score Keeper</h1>
+          <Title />
           <div className="table-container">{dataTable}</div>
         </div>
         <div className="bottom" ref={ref}>

@@ -1,4 +1,9 @@
-import { Dialog, DialogBody, DialogHeader } from '@material-tailwind/react';
+import {
+  Dialog,
+  DialogBody,
+  DialogFooter,
+  DialogHeader,
+} from '@material-tailwind/react';
 import { FunctionComponent, ReactNode } from 'react';
 
 export const Modal: FunctionComponent<{
@@ -6,9 +11,15 @@ export const Modal: FunctionComponent<{
   onClose: () => void;
   title: ReactNode;
   children: ReactNode;
-}> = ({ isOpen, onClose, title, children }) => {
+  size?: 'xl' | 'xxl';
+}> = ({ isOpen, onClose, title, children, size = 'xl' }) => {
   return (
-    <Dialog open={isOpen} handler={onClose} className="relative z-50" size="xl">
+    <Dialog
+      open={isOpen}
+      handler={onClose}
+      className="relative z-50"
+      size={size}
+    >
       <DialogHeader>{title}</DialogHeader>
       <DialogBody>{children}</DialogBody>
     </Dialog>
