@@ -67,11 +67,19 @@ export const Title: FunctionComponent<{}> = () => {
               rel="noopener noreferrer"
             >
               AJ
+            </a>{' '}
+            (
+            <a
+              href="https://github.com/ajalmaguer/molkky-scorekeeper"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              source code
             </a>
-            . Inspired by my friends, who taught me how to play this game during
-            our regular field days. One day, they made me keep score (and do
-            math in my head 😮) so I built this little app to keep score for me
-            (and to save 🌲🌲🌲 too I guess).
+            ) . Inspired by my friends, who taught me how to play this game
+            during our regular field days. One day, they made me keep score (and
+            do math in my head 😮) so I built this little app to keep score for
+            me (and to save 🌲🌲🌲 too I guess).
           </small>
         </div>
       </Modal>
