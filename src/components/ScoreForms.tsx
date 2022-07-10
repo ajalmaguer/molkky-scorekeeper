@@ -69,6 +69,7 @@ export const NewScoreForm: FunctionComponent<{
               size="lg"
               min={0}
               max={12}
+              autoFocus
               required
             />
           </div>
