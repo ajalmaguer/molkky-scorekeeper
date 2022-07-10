@@ -37,19 +37,17 @@
 
 @layer components {
   .top {
-    display: flex;
-    height: 100vh;
-    /* max-height: calc(100vh - 150px); */
+    @apply flex flex-col;
   }
 
   .table-container {
     overflow: scroll;
     @apply m-3;
+    @apply border border-grey-300;
   }
 
   .table-container table {
     @apply border-separate border-spacing-0;
-    @apply border-t border-grey-300;
   }
 
   .table-container thead {
@@ -65,9 +63,8 @@
 
   th,
   td {
-    padding: 5px 10px;
-    @apply border-r border-b border-grey-300;
     transition: background-color 0.3s;
+    @apply border-grey-300;
   }
 
   th:first-child,
@@ -75,6 +72,20 @@
     position: sticky;
     left: 0;
     background-color: white;
-    @apply border-l;
+  }
+
+  th:last-child,
+  td:last-child {
+    /* @apply border-r-0 border-b-0; */
+  }
+
+  th:not(:last-child),
+  td:not(:last-child) {
+    @apply border-r;
+  }
+
+  .table-container tbody tr:not(:last-child) td,
+  .table-container thead th {
+    @apply border-b border-grey-300;
   }
 }
