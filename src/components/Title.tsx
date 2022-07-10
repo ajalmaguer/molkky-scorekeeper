@@ -1,30 +1,54 @@
+import { Button } from '@material-tailwind/react';
 import React, { FunctionComponent } from 'react';
 import {
   AiFillCloseCircle,
+  AiFillSetting,
   AiOutlineQuestionCircle as InfoIcon,
 } from 'react-icons/ai';
 import { Modal } from './Modal';
 import { useModal } from './useModal';
 
-export const Title: FunctionComponent<{}> = () => {
-  const { isOpen, openModal, closeModal } = useModal();
+export const Title: FunctionComponent<{ onReset: () => void }> = ({
+  onReset,
+}) => {
+  const infoModal = useModal();
+  const settingsModal = useModal();
 
   return (
     <>
       <div className="flex justify-between items-center m-3">
-        <div className="basis-5"></div>
+        <div className="basis-5">
+          <button
+            className="basis-5 text-xl transition-colors fill-current text-pink-500 active:text-pink-900"
+            onClick={settingsModal.openModal}
+          >
+            <AiFillSetting />
+          </button>
+        </div>
         <h1 className="text-2xl">Mölkky Score Keeper</h1>
         <button
-          className="basis-5 text-xl transition-colors fill-current text-purple-500 active:text-purple-900"
-          onClick={openModal}
+          className="basis-5 text-xl transition-colors fill-current text-indigo-500 active:text-indigo-900"
+          onClick={infoModal.openModal}
         >
           <InfoIcon />
         </button>
       </div>
 
       <Modal
-        isOpen={isOpen}
-        onClose={closeModal}
+        isOpen={settingsModal.isOpen}
+        onClose={settingsModal.closeModal}
+        title={'Game Settings'}
+      >
+        <div className="flex justify-center items-center w-full">
+          <Button color="red" onClick={onReset}>
+            Reset Game
+          </Button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={infoModal.isOpen}
+        onClose={infoModal.closeModal}
         title={'How to play'}
         size="xxl"
       >
@@ -32,7 +56,10 @@ export const Title: FunctionComponent<{}> = () => {
           className="text-blue-grey-800 prose overflow-y-auto"
           style={{ maxHeight: 'calc(100vh - 100px)' }}
         >
-          <button onClick={closeModal} className="fixed top-4 right-4 text-xl">
+          <button
+            onClick={infoModal.closeModal}
+            className="fixed top-4 right-4 text-xl"
+          >
             <AiFillCloseCircle />
           </button>
           <p>
@@ -56,8 +83,6 @@ export const Title: FunctionComponent<{}> = () => {
             player reaches exactly 50 points. If one score is over 50, that
             player's scroe is lowered to 25.
           </p>
-
-          {/* <hr /> */}
 
           <small>
             Made by{' '}

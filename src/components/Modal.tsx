@@ -5,6 +5,7 @@ import {
   DialogHeader,
 } from '@material-tailwind/react';
 import { FunctionComponent, ReactNode } from 'react';
+import { AiFillCloseCircle } from 'react-icons/ai';
 
 export const Modal: FunctionComponent<{
   isOpen: boolean;
@@ -20,6 +21,9 @@ export const Modal: FunctionComponent<{
       className="relative z-50"
       size={size}
     >
+      <button onClick={onClose} className="absolute top-4 right-4 text-xl">
+        <AiFillCloseCircle />
+      </button>
       <DialogHeader>{title}</DialogHeader>
       <DialogBody>{children}</DialogBody>
     </Dialog>

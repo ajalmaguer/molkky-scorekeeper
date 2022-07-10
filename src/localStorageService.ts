@@ -20,4 +20,14 @@ export const LocalStorageService = {
       localStorage.setItem(key, JSON.stringify(game));
     } catch (error) {}
   },
+  resetGame: function () {
+    try {
+      localStorage.clear();
+      const game = new Game({});
+      localStorage.setItem(key, JSON.stringify(game));
+      return game;
+    } catch (error) {
+      return new Game({});
+    }
+  },
 };

@@ -1,4 +1,4 @@
-import { Button, Progress } from '@material-tailwind/react';
+import { Alert, Button, Progress } from '@material-tailwind/react';
 import { useRef, useState } from 'react';
 import './App.css';
 import {
@@ -17,7 +17,8 @@ import useWindowDimensions from './components/useWindowDimensions';
 import { Title } from './components/Title';
 
 function App() {
-  const { current: game } = useRef(LocalStorageService.getGame());
+  const gameRef = useRef(LocalStorageService.getGame());
+  const game = gameRef.current;
   const [mappedGame, setMappedGame] = useState(mapGame(game));
 
   // ----------------------------------------
@@ -29,11 +30,19 @@ function App() {
     LocalStorageService.backupGame(game);
   }
 
+  function resetGame() {
+    gameRef.current = LocalStorageService.resetGame();
+    setMappedGame(mapGame(gameRef.current));
+  }
+
   // ----------------------------------------
   // generate columns
   // ----------------------------------------
-  const columns: Column<GameDataRow>[] = [
-    {
+  const columns: Column<GameDataRow>[] = [];
+
+  // push round column
+  if (game.teams.map((team) => team.scores).flat().length > 0) {
+    columns.push({
       className: 'p-2',
       header: '',
       content: (rowData, index) => {
@@ -45,8 +54,10 @@ function App() {
           </span>
         );
       },
-    },
-  ];
+    });
+  }
+
+  // push team columns
   game.teams.forEach((team, teamIndex) => {
     columns.push({
       className: 'text-center py-4 px-2',
@@ -65,7 +76,7 @@ function App() {
               }
             />
           </div>
-          <div className="flex flex-wrap gap-3 justify-center min-w-[150px] mb-4">
+          <div className="flex flex-wrap gap-3 justify-center min-w-[200px] mb-4">
             {team.players.map((player, playerIndex) => (
               <div key={playerIndex}>
                 <PlayerButton
@@ -251,17 +262,31 @@ function App() {
     <DataTable columns={columns} data={mappedGame} className="" />
   );
 
-  const nextForm = (
+  const nextForm = game.whosNext ? (
     <>
-      {game.whosNext && (
-        <div className="mb-2">Next Player: {game.whosNext?.name}</div>
-      )}
+      <div className="mb-2">Next Player: {game.whosNext.name}</div>
 
       <NewScoreForm
         onSubmit={submitCurrentTeamScore}
         teamIndex={game.currentTeamIndex}
       />
     </>
+  ) : (
+    <>
+      <Alert color="pink">
+        Please add a player to each team before playing.
+      </Alert>
+    </>
+  );
+
+  const title = (
+    <Title
+      onReset={() => {
+        if (confirm('This cannot be undone.')) {
+          resetGame();
+        }
+      }}
+    />
   );
 
   const { height } = useWindowDimensions();
@@ -274,7 +299,33 @@ function App() {
   if (game.teams.length === 0) {
     return (
       <div>
-        <Title />
+        {title}
+        <div className="flex justify-center items-center h-screen">
+          <div className="text-center m-5 prose">
+            <p>
+              Welcome! Use this little app to keep score when you play{' '}
+              <a
+                href="https://en.wikipedia.org/wiki/M%C3%B6lkky"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                mölkky
+              </a>
+              .
+            </p>
+            <Button
+              className="whitespace-nowrap"
+              color={indexToButtonColor(game.teams.length)}
+              onClick={() => {
+                const newTeamName = prompt('New Team Name (optional)');
+                submitNewTeam(newTeamName);
+                createNewPlayer({ teamIndex: 0, playerName: 'Player 1' });
+              }}
+            >
+              Get Started
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -283,7 +334,7 @@ function App() {
     <>
       <div className="outside">
         <div className="top" style={{ maxHeight }}>
-          <Title />
+          {title}
           <div className="table-container">{dataTable}</div>
         </div>
         <div className="bottom" ref={ref}>
