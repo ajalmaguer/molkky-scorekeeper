@@ -42,7 +42,7 @@
 
   .table-container {
     overflow: scroll;
-    @apply m-3;
+    @apply mx-3 mb-3;
     @apply border border-grey-300;
   }
 

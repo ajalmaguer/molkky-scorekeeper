@@ -274,6 +274,7 @@ function App() {
     <>
       <div className="outside">
         <div className="top" style={{ maxHeight }}>
+          <h1 className="m-3 text-2xl text-center">Mölkky Score Keeper</h1>
           <div className="table-container">{dataTable}</div>
         </div>
         <div className="bottom" ref={ref}>
