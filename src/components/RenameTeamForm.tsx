@@ -25,6 +25,7 @@ export const RenameTeamForm: FunctionComponent<{
           placeholder={`New Team Name`}
           defaultValue={team.name}
           autoFocus
+          autoComplete="off"
         />
       </div>
       <div className="flex justify-center">

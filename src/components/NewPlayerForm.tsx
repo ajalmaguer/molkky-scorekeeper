@@ -26,6 +26,7 @@ export const NewPlayerForm: FunctionComponent<{
           defaultValue={initialNameValue}
           autoFocus
           required
+          autoComplete="off"
         />
       </div>
       <div className="flex justify-center">
