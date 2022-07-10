@@ -16,7 +16,13 @@ export class Game {
   addTeam(name: string) {
     const newTeam = new Team({ name });
     this.teams.push(newTeam);
-    return newTeam.id;
+    return newTeam;
+  }
+
+  addTeamWithPlayer(name: string) {
+    const team = this.addTeam(name);
+    team.addPlayer('New Player');
+    return team;
   }
 
   removeTeam(index: number) {

@@ -164,7 +164,9 @@ function App() {
   // add/remove teams
   // ----------------------------------------
   function submitNewTeam(name: string | null) {
-    updateGame(() => game.addTeam(name || `Team ${game.teams.length + 1}`));
+    updateGame(() =>
+      game.addTeamWithPlayer(name || `Team ${game.teams.length + 1}`)
+    );
   }
 
   function removeTeam({ teamIndex }: { teamIndex: number }) {
@@ -319,7 +321,7 @@ function App() {
               onClick={() => {
                 const newTeamName = prompt('New Team Name (optional)');
                 submitNewTeam(newTeamName);
-                createNewPlayer({ teamIndex: 0, playerName: 'Player 1' });
+                // createNewPlayer({ teamIndex: 0, playerName: 'Player 1' });
               }}
             >
               Get Started
