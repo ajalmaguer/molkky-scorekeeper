@@ -41,6 +41,13 @@ function App() {
     setMappedGame(mapGame(gameRef.current));
   }
 
+  let hasATeamWon = false;
+  game.teams.forEach((team) => {
+    if (team.totalScore === 50) {
+      hasATeamWon = true;
+    }
+  });
+
   // ----------------------------------------
   // generate columns
   // ----------------------------------------
@@ -346,9 +353,11 @@ function App() {
           {title}
           <div className="table-container">{dataTable}</div>
         </div>
-        <div className="bottom" ref={ref}>
-          {nextForm}
-        </div>
+        {!hasATeamWon && (
+          <div className="bottom" ref={ref}>
+            {nextForm}
+          </div>
+        )}
       </div>
     </>
   );
