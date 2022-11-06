@@ -6,7 +6,8 @@ import {
   TabsBody,
   TabsHeader,
 } from '@material-tailwind/react';
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useState } from 'react';
+import { AiFillCloseCircle, AiOutlineCloseCircle } from 'react-icons/ai';
 import { Team } from '../game';
 import { indexToButtonColor } from './indexToColor';
 import { Modal } from './Modal';
@@ -20,8 +21,32 @@ export const TeamButton: FunctionComponent<{
   onDelete: () => void;
   teamIndex: number;
   onAddPlayer: (playerName: string) => void;
-}> = ({ team, onRename, onDelete, teamIndex, onAddPlayer }) => {
-  const { isOpen, openModal, closeModal } = useModal();
+}> = ({
+  team,
+  onRename: _onRename,
+  onDelete,
+  teamIndex,
+  onAddPlayer: _onAddPlayer,
+}) => {
+  const { isOpen, openModal, closeModal: _closeModal } = useModal();
+  function closeModal() {
+    resetNotification();
+    _closeModal();
+  }
+  const [notification, setNotification] = useState('');
+  function resetNotification() {
+    setNotification('');
+  }
+
+  function onAddPlayer(playerName: string) {
+    setNotification(`Player added: ${playerName}`);
+    _onAddPlayer(playerName);
+  }
+
+  function onRename(newName: string) {
+    closeModal();
+    _onRename(newName);
+  }
 
   return (
     <>
@@ -45,6 +70,20 @@ export const TeamButton: FunctionComponent<{
             <TabsBody>
               <TabPanel value="Add Player">
                 <NewPlayerForm onChange={onAddPlayer} />
+                {notification && (
+                  <div
+                    className={[
+                      'p-2',
+                      'border border-light-green-500 rounded-lg',
+                      'bg-light-green-50',
+                      'flex justify-between items-center',
+                      'mt-5',
+                    ].join(' ')}
+                  >
+                    {notification}
+                    <AiFillCloseCircle onClick={resetNotification} />
+                  </div>
+                )}
               </TabPanel>
               <TabPanel value="Settings">
                 <RenameTeamForm team={team} onChange={onRename} />
@@ -53,10 +92,12 @@ export const TeamButton: FunctionComponent<{
                   <Button
                     color="red"
                     onClick={() => {
-                      // if (confirm('Are you sure you want to delete this team?')) {
-                      onDelete();
-                      closeModal();
-                      // }
+                      if (
+                        confirm('Are you sure you want to delete this team?')
+                      ) {
+                        onDelete();
+                        closeModal();
+                      }
                     }}
                   >
                     Delete Team

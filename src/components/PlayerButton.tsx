@@ -17,8 +17,13 @@ export const PlayerButton: FunctionComponent<{
   onRename: (newName: string) => void;
   onDelete: () => void;
   isNext: boolean;
-}> = ({ player, isNext, onRename, onDelete }) => {
+}> = ({ player, isNext, onRename: _onRename, onDelete }) => {
   const { isOpen, openModal, closeModal } = useModal();
+
+  function onRename(newName: string) {
+    closeModal();
+    _onRename(newName);
+  }
 
   return (
     <>

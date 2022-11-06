@@ -1,9 +1,4 @@
-import {
-  Dialog,
-  DialogBody,
-  DialogFooter,
-  DialogHeader,
-} from '@material-tailwind/react';
+import { Dialog, DialogBody, DialogHeader } from '@material-tailwind/react';
 import { FunctionComponent, ReactNode } from 'react';
 import { AiFillCloseCircle } from 'react-icons/ai';
 
