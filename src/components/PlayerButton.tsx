@@ -49,6 +49,7 @@ export const PlayerButton: FunctionComponent<{
               <NewPlayerForm
                 onChange={onRename}
                 initialNameValue={player.name}
+                resetFormOnSubmit={false}
               />
             </TabPanel>
             <TabPanel value="Settings">

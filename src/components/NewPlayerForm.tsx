@@ -4,7 +4,8 @@ import { FormEvent, FunctionComponent, useRef } from 'react';
 export const NewPlayerForm: FunctionComponent<{
   initialNameValue?: string;
   onChange: (name: string) => void;
-}> = ({ initialNameValue = '', onChange }) => {
+  resetFormOnSubmit?: boolean;
+}> = ({ initialNameValue = '', onChange, resetFormOnSubmit = true }) => {
   const formRef = useRef<HTMLFormElement>(null);
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -13,7 +14,9 @@ export const NewPlayerForm: FunctionComponent<{
 
     onChange(name as string);
 
-    formRef.current?.reset();
+    if (resetFormOnSubmit) {
+      formRef.current?.reset();
+    }
   }
 
   return (
