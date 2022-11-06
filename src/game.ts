@@ -42,6 +42,12 @@ export class Game {
     this.teams[this.currentTeamIndex].addScore(score);
     this.nextPlayer();
   }
+
+  resetScoresForNextGame() {
+    this.teams.forEach((team) => {
+      team.scores = [];
+    });
+  }
 }
 
 export class Team {

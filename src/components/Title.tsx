@@ -8,11 +8,29 @@ import {
 import { Modal } from './Modal';
 import { useModal } from './useModal';
 
-export const Title: FunctionComponent<{ onReset: () => void }> = ({
-  onReset,
-}) => {
+export const Title: FunctionComponent<{
+  onReset: () => void;
+  onResetScoresForNextGame: () => void;
+}> = (props) => {
   const infoModal = useModal();
   const settingsModal = useModal();
+
+  function onResetScoresForNextGame() {
+    if (confirm('Are you sure you want to start a new game?')) {
+      props.onResetScoresForNextGame();
+      settingsModal.closeModal();
+    }
+  }
+  function onReset() {
+    if (
+      confirm(
+        'Are you sure you want to clear out all teams and players? This cannot be undone.'
+      )
+    ) {
+      props.onReset();
+      settingsModal.closeModal();
+    }
+  }
 
   return (
     <>
@@ -39,9 +57,13 @@ export const Title: FunctionComponent<{ onReset: () => void }> = ({
         onClose={settingsModal.closeModal}
         title={'Game Settings'}
       >
-        <div className="flex justify-center items-center w-full">
+        <div className="flex flex-col gap-10 justify-center items-center w-full">
+          <Button color="green" onClick={onResetScoresForNextGame}>
+            Another game!
+          </Button>
+
           <Button color="red" onClick={onReset}>
-            Reset Game
+            Reset Everything
           </Button>
         </div>
       </Modal>

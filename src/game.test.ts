@@ -159,7 +159,32 @@ describe('Game > submitScoreForCurrentTeam', () => {
   });
 });
 
-test('create a new instance of a game with stringified json data', () => {
+test('Restoring a game from localstorage: create a new instance of a game with stringified json data', () => {
+  const seedGame = getSeedGame();
+
+  const stringifiedGame = JSON.stringify(seedGame, null, 2);
+  const restoredGame = new Game(JSON.parse(stringifiedGame));
+  expect(JSON.stringify(restoredGame, null, 2)).toEqual(stringifiedGame);
+});
+
+describe('Game', () => {
+  it('can be reset with the same players and teams for a new game', () => {
+    const seedGame = getSeedGame();
+    seedGame.teams.forEach((team) => {
+      expect(team.scores.length).toBeGreaterThan(0);
+      expect(team.totalScore).toBeGreaterThan(0);
+    });
+
+    seedGame.resetScoresForNextGame();
+
+    seedGame.teams.forEach((team) => {
+      expect(team.scores.length).toEqual(0);
+      expect(team.totalScore).toEqual(0);
+    });
+  });
+});
+
+function getSeedGame() {
   const seedGame = new Game({});
   seedGame.addTeam('team 1');
   seedGame.teams[0].addPlayer('player a');
@@ -177,7 +202,5 @@ test('create a new instance of a game with stringified json data', () => {
   seedGame.teams[1].addScore(5);
   seedGame.nextPlayer();
 
-  const stringifiedGame = JSON.stringify(seedGame, null, 2);
-  const restoredGame = new Game(JSON.parse(stringifiedGame));
-  expect(JSON.stringify(restoredGame, null, 2)).toEqual(stringifiedGame);
-});
+  return seedGame;
+}

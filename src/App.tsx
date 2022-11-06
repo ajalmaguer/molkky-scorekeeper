@@ -30,6 +30,12 @@ function App() {
     LocalStorageService.backupGame(game);
   }
 
+  function resetScoresForNextGame() {
+    updateGame(() => {
+      game.resetScoresForNextGame();
+    });
+  }
+
   function resetGame() {
     gameRef.current = LocalStorageService.resetGame();
     setMappedGame(mapGame(gameRef.current));
@@ -283,10 +289,11 @@ function App() {
 
   const title = (
     <Title
+      onResetScoresForNextGame={() => {
+        resetScoresForNextGame();
+      }}
       onReset={() => {
-        if (confirm('This cannot be undone.')) {
-          resetGame();
-        }
+        resetGame();
       }}
     />
   );
