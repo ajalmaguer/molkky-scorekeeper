@@ -28,10 +28,10 @@ export const PlayerButton: FunctionComponent<{
   return (
     <>
       <Button
-        size="md"
+        size='sm'
         color={isNext ? 'yellow' : 'blue-grey'}
         variant={isNext ? 'filled' : 'outlined'}
-        className="!rounded-lg !py-2 !px-4"
+        className="!rounded-lg !py-1 !px-2"
         onClick={openModal}
       >
         {player.name}

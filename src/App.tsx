@@ -11,10 +11,11 @@ import { TeamButton } from './components/TeamButton';
 import { Column, DataTable } from './data_table';
 
 import { ScoreButton } from './components/ScoreButton';
+import { Summary, SummaryChip } from './components/SummaryChip';
+import { Title } from './components/Title';
+import useWindowDimensions from './components/useWindowDimensions';
 import { LocalStorageService } from './localStorageService';
 import { GameDataRow, mapGame, runningTotalKey } from './mapGame';
-import useWindowDimensions from './components/useWindowDimensions';
-import { Title } from './components/Title';
 
 function App() {
   const gameRef = useRef(LocalStorageService.getGame());
@@ -41,12 +42,14 @@ function App() {
     setMappedGame(mapGame(gameRef.current));
   }
 
-  let hasATeamWon = false;
-  game.teams.forEach((team) => {
-    if (team.totalScore === 50) {
-      hasATeamWon = true;
-    }
-  });
+  function createATeamAndAddAPlayer() {
+    const newTeamName = prompt('New Team Name (optional)');
+    const playerName = prompt(
+      `Name first player on team (optional)`,
+      newTeamName || ''
+    );
+    submitNewTeam(newTeamName, playerName);
+  }
 
   // ----------------------------------------
   // generate columns
@@ -76,7 +79,7 @@ function App() {
       className: 'text-center py-4 px-2',
       header: (
         <div className="">
-          <div className="mb-4">
+          <div className="mb-2">
             <TeamButton
               teamIndex={teamIndex}
               team={team}
@@ -89,7 +92,7 @@ function App() {
               }
             />
           </div>
-          <div className="flex flex-wrap gap-3 justify-center min-w-[200px] mb-4">
+          <div className="flex flex-wrap gap-1 justify-center min-w-[150px] mb-2">
             {team.players.map((player, playerIndex) => (
               <div key={playerIndex}>
                 <PlayerButton
@@ -161,10 +164,7 @@ function App() {
         <Button
           className="whitespace-nowrap"
           color={indexToButtonColor(game.teams.length)}
-          onClick={() => {
-            const newTeamName = prompt('New Team Name (optional)');
-            submitNewTeam(newTeamName);
-          }}
+          onClick={createATeamAndAddAPlayer}
         >
           Add a Team
         </Button>
@@ -174,11 +174,28 @@ function App() {
   });
 
   // ----------------------------------------
+  // generate team summaries
+  // ----------------------------------------
+  const summaries: Summary[] = game.teams
+    .map((team, i) => {
+      return {
+        name: team.name,
+        totalScore: team.totalScore,
+        toWin: 50 - team.totalScore,
+        teamIndex: i,
+      };
+    })
+    .sort((a, b) => (a.totalScore > b.totalScore ? -1 : 1));
+
+  // ----------------------------------------
   // add/remove teams
   // ----------------------------------------
-  function submitNewTeam(name: string | null) {
+  function submitNewTeam(name: string | null, playerName: string | null) {
     updateGame(() =>
-      game.addTeamWithPlayer(name || `Team ${game.teams.length + 1}`)
+      game.addTeamWithPlayer(
+        name || `Team ${game.teams.length + 1}`,
+        playerName || 'New Player'
+      )
     );
   }
 
@@ -332,11 +349,7 @@ function App() {
             <Button
               className="whitespace-nowrap"
               color={indexToButtonColor(game.teams.length)}
-              onClick={() => {
-                const newTeamName = prompt('New Team Name (optional)');
-                submitNewTeam(newTeamName);
-                // createNewPlayer({ teamIndex: 0, playerName: 'Player 1' });
-              }}
+              onClick={createATeamAndAddAPlayer}
             >
               Get Started
             </Button>
@@ -351,13 +364,16 @@ function App() {
       <div className="outside">
         <div className="top" style={{ maxHeight }}>
           {title}
+          <div className="px-3 mb-2 flex gap-1 overflow-scroll">
+            {summaries.map((summary, i) => (
+              <SummaryChip summary={summary} key={i} />
+            ))}
+          </div>
           <div className="table-container">{dataTable}</div>
         </div>
-        {!hasATeamWon && (
-          <div className="bottom" ref={ref}>
-            {nextForm}
-          </div>
-        )}
+        <div className="bottom" ref={ref}>
+          {nextForm}
+        </div>
       </div>
     </>
   );

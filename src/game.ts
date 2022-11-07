@@ -19,9 +19,9 @@ export class Game {
     return newTeam;
   }
 
-  addTeamWithPlayer(name: string) {
+  addTeamWithPlayer(name: string, playerName: string) {
     const team = this.addTeam(name);
-    team.addPlayer('New Player');
+    team.addPlayer(playerName);
     return team;
   }
 

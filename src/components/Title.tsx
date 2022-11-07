@@ -85,8 +85,8 @@ export const Title: FunctionComponent<{
             <AiFillCloseCircle />
           </button>
           <p>
-            <strong>Beginning the game:</strong> First player throws under at
-            the grouping and tries to knock over pins.
+            <strong>Beginning the game:</strong> First player throws underhand
+            at the grouping and tries to knock over pins.
           </p>
 
           <p>
