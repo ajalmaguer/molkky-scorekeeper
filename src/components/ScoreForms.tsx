@@ -43,6 +43,7 @@ export const EditScoreForm: FunctionComponent<{
             defaultValue={initialScore}
             autoFocus
             required
+            inputMode="decimal"
           />
         </div>
         <div className="flex justify-center">
@@ -71,6 +72,7 @@ export const NewScoreForm: FunctionComponent<{
               max={12}
               autoFocus
               required
+              inputMode="decimal"
             />
           </div>
           <Button type="submit" color={indexToButtonColor(teamIndex)}>
